@@ -82,6 +82,10 @@ All contracts are deployed on BNB Chain mainnet and verified on BscScan. Their a
 
 Contract ownership is held by a 3-of-4 Safe multisig, and sensitive parameter changes go through an 8-day timelock.
 
+## Market makers
+
+Market makers keep funds in their own address and quote through the API. See [docs/MARKET_MAKER_INTEGRATION.md](docs/MARKET_MAKER_INTEGRATION.md) for the contract calls (allowances, signing address, price range) and how to get an API key.
+
 ## Security
 
 Please do not report security vulnerabilities through public issues. See [SECURITY.md](SECURITY.md).
@@ -115,5 +119,7 @@ npm run dev
 然后打开 http://localhost:8080。开发服务器默认把 `/api`、`/ws`、`/rpc` 转发到 https://sordexpro.com；要换成别的后端，设置 `UPSTREAM` 环境变量。
 
 **许可证**：代码采用 GPL-3.0。SorDex 名称和 SORDEX Logo 不在许可范围内，不得用于标识分叉或衍生产品。
+
+**做市商接入**：合约调用参数和 API Key 领取方法见 [docs/MARKET_MAKER_INTEGRATION.md](docs/MARKET_MAKER_INTEGRATION.md)。
 
 **安全问题**：请不要在公开 Issue 里提交，见 [SECURITY.md](SECURITY.md)。
