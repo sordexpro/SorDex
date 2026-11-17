@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="/logo.png">
+<title>历史合约资产取回 · SORDEX</title>
+<style>  :root{--bg:#0b0d10;--card:#13161b;--line:#232830;--fg:#e8eaed;--muted:#8d96a1;--buy:#18c08f;--sell:#ef5350;--accent:#7c5cff;--accent2:#18c08f}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.6 Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC","Microsoft YaHei",sans-serif;padding:16px}
+  .wrap{max-width:640px;margin:0 auto}
+  .top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:4px 0 12px}
+  .top a{color:var(--muted);text-decoration:none;font-size:13px}
+  .lang{display:flex;gap:4px}
+  .lang button{padding:4px 10px;font-size:12px}
+  .lang button.on{border-color:var(--accent);color:var(--fg)}
+  h1{font-size:22px;margin:8px 0 6px}
+  .sub{color:var(--muted);font-size:13.5px;margin:0 0 16px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:12px}
+  .row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:5px 0;flex-wrap:wrap}
+  .k{color:var(--muted);font-size:13.5px}
+  .v{font-variant-numeric:tabular-nums;font-family:"Roboto Mono",ui-monospace,Menlo,monospace;font-size:13.5px;text-align:right;word-break:break-all}
+  button{appearance:none;border:1px solid var(--line);background:#1b1f26;color:var(--fg);border-radius:9px;padding:9px 14px;font-size:13.5px;cursor:pointer;font-family:inherit}
+  button.primary{background:linear-gradient(90deg,var(--accent2),var(--accent));border:0;color:#06101c;font-weight:600}
+  button.ghost{background:transparent}
+  button:disabled{opacity:.45;cursor:not-allowed}
+  .btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+  .sec{font-size:13px;color:var(--muted);margin:18px 2px 8px;letter-spacing:.02em}
+  .tok{font-weight:600}
+  .tag{color:var(--muted);font-size:12px;font-weight:400;margin-left:6px}
+  .msg{min-height:20px;font-size:13.5px;margin:10px 2px}
+  .ok{color:var(--buy)} .bad{color:var(--sell)} .muted{color:var(--muted)}
+  .cardmsg{min-height:18px;font-size:12.5px;margin-top:8px}
+  .note{color:var(--muted);font-size:12.5px;line-height:1.7}
+  .note li{margin:2px 0}
+  @media(max-width:480px){ body{padding:12px} h1{font-size:19px} .row{align-items:flex-start} .v{text-align:left} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <a href="/" data-t="back">返回 SORDEX</a>
+    <div class="lang"><button data-lang="zh">中</button><button data-lang="en">EN</button></div>
+  </div>
+  <h1 data-t="title">历史合约资产取回</h1>
+  <p class="sub" data-t="sub">SORDEX 升级过几次合约。如果你曾在旧版本里存入做市资金、挂单，或有没领的手续费，这些资产仍然属于你，可以在这里取回。</p>
+
+  <div class="card">
+    <div class="row"><span class="k" data-t="wallet">钱包</span><span class="v" id="acct">-</span></div>
+    <div class="btns"><button class="primary" id="connect" data-t="connect">连接钱包</button><button class="ghost" id="refresh" data-t="refresh">重新查询</button></div>
+  </div>
+
+  <div class="msg muted" id="msg"></div>
+  <div id="list"></div>
+
+  <div class="card note">
+    <b data-t="howTitle">怎么取回</b>
+    <ul>
+      <li data-t="how1">做市金库：先点「申请提现」，等锁定期结束后点「完成提现」，资产回到你的钱包。锁定期内可以随时取消。</li>
+      <li data-t="how2">旧挂单：点「撤单」，挂单里锁定的资产会直接退回你的钱包。</li>
+      <li data-t="how3">手续费：点「领取」，直接转到你的钱包。</li>
+      <li data-t="how4">每一步都是你自己的钱包签名发出的链上交易，需要少量 BNB 付手续费。平台不经手你的资产。</li>
+    </ul>
+  </div>
+</div>
+<script src="/config.js"></script>
+<script type="module" src="/reclaim-legacy.js?v=20261116r1"></script>
+</body>
+</html>

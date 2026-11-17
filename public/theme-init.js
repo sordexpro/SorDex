@@ -1,0 +1,1 @@
+try { if (localStorage.getItem('sordex.theme') === 'light') { document.documentElement.classList.add('light'); var m = document.querySelector('meta[name=theme-color]'); if (m) m.content = '#ffffff'; } } catch (e) {}

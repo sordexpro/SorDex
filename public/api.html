@@ -1,0 +1,1181 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SORDEX API 文档</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>:root{
+  --bg:#07090d; --surface:#10141b; --surface2:#171c25; --surface3:#1c222d;
+  --fg:#e9edf3; --muted:#8a93a3; --hair:#222a36;
+  --accent:#0cc595; --accent-2:#2fe3b8; --accent-soft:rgba(12,197,149,.13);
+  --purple:#934afb; --purple-soft:rgba(147,74,251,.14);
+  --grad:linear-gradient(135deg,#0cc595 0%,#934afb 100%);
+  --warn:#d9a62b; --ws:#5b9af0;
+  --mono:"Roboto Mono",ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;
+  --sans:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:14px;line-height:1.65;-webkit-font-smoothing:antialiased}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+code,pre{font-family:var(--mono)}
+
+.top{display:flex;align-items:center;gap:16px;padding:0 20px;height:54px;border-bottom:1px solid var(--hair);background:rgba(16,20,27,.9);backdrop-filter:blur(8px);position:sticky;top:0;z-index:10}
+.brand{font-weight:700;letter-spacing:.06em;font-size:16px;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.brand a{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.top .sub{color:var(--muted);font-size:13px;letter-spacing:.01em}
+.top-right{margin-left:auto;display:flex;align-items:center;gap:12px}
+.lang{display:flex;border:1px solid var(--hair);border-radius:7px;overflow:hidden}
+.lang button{border:none;background:transparent;color:var(--muted);font-size:12px;padding:5px 11px;cursor:pointer;font-family:inherit}
+.lang button.on{background:var(--surface2);color:var(--fg)}
+.back{color:var(--muted);font-size:13px}
+
+.wrap{display:grid;grid-template-columns:238px 1fr;max-width:1120px;margin:0 auto}
+.toc{position:sticky;top:54px;align-self:start;height:calc(100vh - 54px);overflow-y:auto;padding:20px 12px 48px;border-right:1px solid var(--hair)}
+.toc a{display:block;color:var(--muted);padding:5px 10px;border-radius:6px;font-size:12.5px;line-height:1.4}
+.toc a:hover{color:var(--fg);text-decoration:none;background:var(--surface2)}
+.toc .grp{color:var(--fg);font-weight:600;margin:16px 0 4px;font-size:11px;text-transform:uppercase;letter-spacing:.08em;padding:0 10px}
+.toc .grp:first-child{margin-top:0}
+.main{padding:30px 36px 90px;min-width:0}
+h1{font-size:26px;margin:0 0 4px;letter-spacing:-.01em}
+h1 .g{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+h2{font-size:19px;margin:40px 0 10px;padding-top:14px;border-top:1px solid var(--hair);letter-spacing:-.01em}
+h3{font-size:14.5px;margin:22px 0 8px;color:var(--fg);font-weight:600}
+p{margin:9px 0;max-width:74ch}
+.lead{color:var(--muted);max-width:74ch;font-size:14.5px}
+ul{margin:9px 0;padding-left:20px;max-width:74ch}
+li{margin:4px 0}
+.note{background:var(--surface);border:1px solid var(--hair);border-left:2px solid var(--accent);border-radius:8px;padding:11px 14px;margin:14px 0;max-width:74ch;font-size:13px;color:var(--fg)}
+.note.warn{border-left-color:var(--warn)}
+.note.purple{border-left-color:var(--purple)}
+
+.ep{background:var(--surface);border:1px solid var(--hair);border-radius:9px;padding:12px 14px;margin:12px 0}
+.ep-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-family:var(--mono);font-size:13.5px}
+.m{font-weight:600;font-size:10.5px;padding:3px 7px;border-radius:5px;letter-spacing:.04em}
+.m.get{background:var(--accent-soft);color:var(--accent-2)}
+.m.post{background:var(--purple-soft);color:#b98bff}
+.m.ws{background:rgba(91,154,240,.15);color:var(--ws)}
+.m.call{background:rgba(217,166,43,.15);color:var(--warn)}
+.path{color:var(--fg);word-break:break-all}
+.auth{margin-left:auto;font-family:var(--sans);font-size:11px;color:var(--muted);border:1px solid var(--hair);border-radius:5px;padding:2px 7px}
+.ep-desc{color:var(--muted);font-size:13px;margin:8px 0 0}
+
+table{border-collapse:collapse;width:100%;margin:10px 0;font-size:13px;display:block;overflow-x:auto}
+th,td{text-align:left;padding:7px 11px;border-bottom:1px solid var(--hair);white-space:nowrap;vertical-align:top}
+th{color:var(--muted);font-weight:500;font-size:11.5px;text-transform:uppercase;letter-spacing:.04em}
+td{font-family:var(--mono);font-size:12.5px}
+td.d{font-family:var(--sans);color:var(--muted);white-space:normal;min-width:16ch}
+.addr-tbl td{font-size:12px}
+.addr-tbl .a{color:var(--accent)}
+
+pre{background:#05070a;border:1px solid var(--hair);border-radius:8px;padding:12px 14px;overflow-x:auto;font-size:12.5px;line-height:1.6;margin:10px 0;color:#cdd6e2}
+pre .k{color:var(--accent-2)} pre .s{color:#e0a978} pre .c{color:var(--muted)} pre .p{color:#b98bff}
+code.inl{background:var(--surface2);border:1px solid var(--hair);border-radius:4px;padding:1px 5px;font-size:12px;color:var(--fg)}
+
+.foot{color:var(--muted);font-size:12px;border-top:1px solid var(--hair);margin-top:48px;padding-top:16px}
+[data-lang="en"]{display:none}
+body.en [data-lang="en"]{display:revert}
+body.en [data-lang="zh"]{display:none}
+@media(max-width:860px){
+  .wrap{grid-template-columns:1fr}
+  .toc{display:none}
+  .main{padding:22px 16px 60px}
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="brand"><a href="/">SORDEX</a> <span class="sub"><span data-lang="zh">API 参考</span><span data-lang="en">API Reference</span></span></div>
+  <div class="top-right">
+    <a class="back" href="/"><span data-lang="zh">返回应用</span><span data-lang="en">Back to app</span></a>
+    <div class="lang" id="lang"><button data-lang-btn="zh" class="on">中</button><button data-lang-btn="en">EN</button></div>
+  </div>
+</header>
+
+<div class="wrap">
+  <nav class="toc" id="toc">
+    <div data-lang="zh">
+      <div class="grp">开始</div>
+      <a href="#overview">概览</a><a href="#base">基址 · 鉴权 · 限流</a>
+      <div class="grp">公开数据</div>
+      <a href="#pairs">交易对</a><a href="#book">盘口</a><a href="#market">成交 · K 线 · 订单</a><a href="#aggregator">聚合商标准数据</a><a href="#token">代币检测</a><a href="#ws">WebSocket</a>
+      <div class="grp">做市商（自助 Key）</div>
+      <a href="#mm-model">接入模型</a><a href="#mm-key">申领与轮换 Key</a><a href="#mm-ips">IP 白名单</a><a href="#mm-status">Key 状态</a><a href="#mm-exposure">做市预算与指标</a><a href="#mm-hosted">托管做市</a><a href="#mm-contact">高级做市联系</a>
+      <div class="grp">交易 API</div>
+      <a href="#trade-model">概览</a><a href="#trade-order">下单</a><a href="#trade-cancel">撤单</a><a href="#trade-query">查询</a>
+      <div class="grp">下单与签名</div>
+      <a href="#eip712">EIP-712 域与结构</a><a href="#quote">提交签名报价</a><a href="#signed-quotes">查询签名盘口</a><a href="#admission">报价准入</a><a href="#agent">代理自动挂单</a><a href="#tax">项目方交易税</a>
+      <div class="grp">链上与上币</div>
+      <a href="#contracts">合约地址</a><a href="#onchain">核心合约函数</a><a href="#listing">无许可建对</a>
+      <div class="grp">参考</div>
+      <a href="#errors">错误码</a>
+    </div>
+    <div data-lang="en">
+      <div class="grp">Start</div>
+      <a href="#overview">Overview</a><a href="#base">Base · Auth · Limits</a>
+      <div class="grp">Public data</div>
+      <a href="#pairs">Pairs</a><a href="#book">Order book</a><a href="#market">Trades · Candles · Orders</a><a href="#aggregator">Aggregator feed</a><a href="#token">Token checks</a><a href="#ws">WebSocket</a>
+      <div class="grp">Market making (self-serve key)</div>
+      <a href="#mm-model">Access model</a><a href="#mm-key">Issue & rotate key</a><a href="#mm-ips">IP allowlist</a><a href="#mm-status">Key status</a><a href="#mm-exposure">Budget & metrics</a><a href="#mm-hosted">Hosted MM</a><a href="#mm-contact">Advanced MM contact</a>
+      <div class="grp">Trading API</div>
+      <a href="#trade-model">Overview</a><a href="#trade-order">Place an order</a><a href="#trade-cancel">Cancel</a><a href="#trade-query">Queries</a>
+      <div class="grp">Orders & signing</div>
+      <a href="#eip712">EIP-712 domains</a><a href="#quote">Submit quotes</a><a href="#signed-quotes">Signed book</a><a href="#admission">Quote admission</a><a href="#agent">Agent quoting</a><a href="#tax">Project transfer tax</a>
+      <div class="grp">On-chain & listing</div>
+      <a href="#contracts">Contract addresses</a><a href="#onchain">Core contract calls</a><a href="#listing">Permissionless listing</a>
+      <div class="grp">Reference</div>
+      <a href="#errors">Error codes</a>
+    </div>
+  </nav>
+
+  <main class="main" id="main">
+    <h1>SORDEX <span class="g" data-lang="zh">API 参考</span><span class="g" data-lang="en">API Reference</span></h1>
+
+    <section id="overview">
+      <div data-lang="zh">
+        <h2>概览</h2>
+        <p class="lead">SORDEX 是 BSC 主网（chainId 56）上的非托管现货订单簿 DEX。对接分三层：</p>
+        <ul>
+          <li><b>公开数据 REST / WebSocket</b>：交易对、盘口、成交、K 线、聚合商标准数据。只读，无需鉴权。</li>
+          <li><b>链上合约</b>：挂单、撤单、改价、吃单、建对、做市金库充提，直接调合约，由钱包私钥签交易。资金安全只由链上保证。</li>
+          <li><b>签名报价（做市）</b>：做市商用 EIP-712 离线签名报价提交到撮合层，改价零 gas；资金锁在做市金库，成交时原子交割。</li>
+        </ul>
+        <div class="note">读接口返回的是缓存视图，用于展示与路由，不作为资金真相；资金状态以链上为准。</div>
+      </div>
+      <div data-lang="en">
+        <h2>Overview</h2>
+        <p class="lead">SORDEX is a non-custodial spot order-book DEX on BSC mainnet (chainId 56). Integration spans three layers:</p>
+        <ul>
+          <li><b>Public REST / WebSocket</b>: pairs, order book, trades, candles, aggregator feeds. Read-only, no auth.</li>
+          <li><b>On-chain contracts</b>: placing, cancelling, amending, taking, listing and vault deposits/withdrawals call contracts directly, signed by your wallet key. Fund safety is guaranteed only on-chain.</li>
+          <li><b>Signed quotes (market making)</b>: makers post EIP-712 off-chain quotes to the matching layer; repricing is gasless. Funds stay in the vault and settle atomically on fill.</li>
+        </ul>
+        <div class="note">Read endpoints return cached views for display and routing, not the source of truth for funds; fund state is authoritative on-chain.</div>
+      </div>
+    </section>
+
+    <section id="base">
+      <div data-lang="zh">
+        <h2>基址 · 鉴权 · 限流</h2>
+        <p><b>基址</b>：<code class="inl">https://sordexpro.com/api</code>，所有路径拼在其后，返回 JSON。</p>
+        <p><b>鉴权</b>：只读接口无需鉴权。做市报价按 <a href="#admission">报价准入</a>规则，带 <code class="inl">x-mm-key</code> 请求头或满足金库余额条件。做市管理接口（申领 Key、托管订阅等）用钱包 EIP-712 签名鉴权，无账户密码体系。</p>
+        <p><b>限流</b>（按 IP）：</p>
+        <table>
+          <tr><th>接口</th><th>限额</th></tr>
+          <tr><td>/quote · /quote/batch</td><td class="d">120 / 分钟</td></tr>
+          <tr><td>/mm/issue · /mm/update-ips</td><td class="d">10 / 分钟</td></tr>
+          <tr><td>/mm/subscribe · /mm/unsubscribe</td><td class="d">60 / 分钟</td></tr>
+          <tr><td>/mm/contact</td><td class="d">5 / 分钟</td></tr>
+          <tr><td>/scan-token · /listing-meta</td><td class="d">10 / 分钟</td></tr>
+          <tr><td>/token-meta</td><td class="d">20 / 分钟</td></tr>
+        </table>
+        <p>行情类只读接口为轻量缓存，实时数据请用 WebSocket 订阅，不要轮询。出错返回对应 HTTP 状态码与 <code class="inl">{"error":"…"}</code>，详见 <a href="#errors">错误码</a>。</p>
+      </div>
+      <div data-lang="en">
+        <h2>Base · Auth · Limits</h2>
+        <p><b>Base URL</b>: <code class="inl">https://sordexpro.com/api</code>. Append each path; responses are JSON.</p>
+        <p><b>Auth</b>: read endpoints need none. Quoting follows the <a href="#admission">quote admission</a> rules — send an <code class="inl">x-mm-key</code> header or meet the vault-balance condition. Market-making management endpoints (key issuance, hosted subscription) authenticate by wallet EIP-712 signature; there are no account passwords.</p>
+        <p><b>Rate limits</b> (per IP):</p>
+        <table>
+          <tr><th>endpoint</th><th>limit</th></tr>
+          <tr><td>/quote · /quote/batch</td><td class="d">120 / min</td></tr>
+          <tr><td>/mm/issue · /mm/update-ips</td><td class="d">10 / min</td></tr>
+          <tr><td>/mm/subscribe · /mm/unsubscribe</td><td class="d">60 / min</td></tr>
+          <tr><td>/mm/contact</td><td class="d">5 / min</td></tr>
+          <tr><td>/scan-token · /listing-meta</td><td class="d">10 / min</td></tr>
+          <tr><td>/token-meta</td><td class="d">20 / min</td></tr>
+        </table>
+        <p>Market-data reads are lightly cached; subscribe to the WebSocket for live data instead of polling. Errors return the matching HTTP status and <code class="inl">{"error":"…"}</code>; see <a href="#errors">error codes</a>.</p>
+      </div>
+    </section>
+
+    <section id="pairs">
+      <div data-lang="zh">
+        <h2>交易对</h2>
+        <div class="ep"><div class="ep-head"><span class="m get">GET</span><span class="path">/pairs</span><span class="auth">无鉴权</span></div><div class="ep-desc">列出全部交易对及参数，按活跃挂单数降序。</div></div>
+        <table>
+          <tr><th>字段</th><th>说明</th></tr>
+          <tr><td>pairId</td><td class="d">交易对编号</td></tr>
+          <tr><td>base / quote</td><td class="d">基础币 / 计价币合约地址（计价币固定 USDT）</td></tr>
+          <tr><td>baseSymbol / quoteSymbol</td><td class="d">符号</td></tr>
+          <tr><td>baseDecimals / quoteDecimals</td><td class="d">精度</td></tr>
+          <tr><td>tick / tickNum / tickDen</td><td class="d">价格最小变动；价格须为 tickNum/tickDen 的整数倍</td></tr>
+          <tr><td>minBaseQty / minNotional</td><td class="d">最小下单量 / 最小名义额（最小单位）</td></tr>
+          <tr><td>takerFeeBps / makerFeeBps</td><td class="d">吃单 / 挂单费率（基点，10 = 0.10%）</td></tr>
+          <tr><td>buyTaxBps / sellTaxBps</td><td class="d">项目方交易税率（基点）</td></tr>
+          <tr><td>openTime / isOpen / paused</td><td class="d">开放交易时间戳（秒，0=立即）/ 当前是否开放 / 是否暂停</td></tr>
+          <tr><td>logo / displayName</td><td class="d">链下展示信息（可能为 null）</td></tr>
+          <tr><td>listingComplete</td><td class="d">上币是否全部步骤完成</td></tr>
+          <tr><td>openOrders</td><td class="d">当前有效挂单数</td></tr>
+        </table>
+        <pre>GET /api/pairs
+
+[{
+  <span class="k">"pairId"</span>:<span class="s">"1"</span>, <span class="k">"base"</span>:<span class="s">"0x…"</span>, <span class="k">"quote"</span>:<span class="s">"0x55d3…7955"</span>,
+  <span class="k">"baseSymbol"</span>:<span class="s">"DEMO"</span>, <span class="k">"quoteSymbol"</span>:<span class="s">"USDT"</span>, <span class="k">"baseDecimals"</span>:18, <span class="k">"quoteDecimals"</span>:18,
+  <span class="k">"tick"</span>:0.01, <span class="k">"tickNum"</span>:<span class="s">"1"</span>, <span class="k">"tickDen"</span>:<span class="s">"100"</span>,
+  <span class="k">"minBaseQty"</span>:<span class="s">"0"</span>, <span class="k">"minNotional"</span>:<span class="s">"0"</span>,
+  <span class="k">"takerFeeBps"</span>:10, <span class="k">"makerFeeBps"</span>:0, <span class="k">"buyTaxBps"</span>:0, <span class="k">"sellTaxBps"</span>:0,
+  <span class="k">"openTime"</span>:1793988678, <span class="k">"isOpen"</span>:false, <span class="k">"paused"</span>:false,
+  <span class="k">"logo"</span>:null, <span class="k">"displayName"</span>:<span class="s">"Demo Coin"</span>, <span class="k">"listingComplete"</span>:true, <span class="k">"openOrders"</span>:0
+}]</pre>
+      </div>
+      <div data-lang="en">
+        <h2>Pairs</h2>
+        <div class="ep"><div class="ep-head"><span class="m get">GET</span><span class="path">/pairs</span><span class="auth">no auth</span></div><div class="ep-desc">List all pairs and their parameters, sorted by live open-order count.</div></div>
+        <table>
+          <tr><th>field</th><th>meaning</th></tr>
+          <tr><td>pairId</td><td class="d">pair id</td></tr>
+          <tr><td>base / quote</td><td class="d">base / quote token address (quote is always USDT)</td></tr>
+          <tr><td>baseSymbol / quoteSymbol</td><td class="d">symbols</td></tr>
+          <tr><td>baseDecimals / quoteDecimals</td><td class="d">decimals</td></tr>
+          <tr><td>tick / tickNum / tickDen</td><td class="d">price step; price must be a multiple of tickNum/tickDen</td></tr>
+          <tr><td>minBaseQty / minNotional</td><td class="d">min order size / min notional (smallest units)</td></tr>
+          <tr><td>takerFeeBps / makerFeeBps</td><td class="d">taker / maker fee in bps (10 = 0.10%)</td></tr>
+          <tr><td>buyTaxBps / sellTaxBps</td><td class="d">project transfer-tax rates (bps)</td></tr>
+          <tr><td>openTime / isOpen / paused</td><td class="d">opening timestamp (sec, 0=immediate) / open now / paused</td></tr>
+          <tr><td>logo / displayName</td><td class="d">off-chain display info (may be null)</td></tr>
+          <tr><td>listingComplete</td><td class="d">all listing steps done</td></tr>
+          <tr><td>openOrders</td><td class="d">live open-order count</td></tr>
+        </table>
+        <pre>GET /api/pairs
+
+[{
+  <span class="k">"pairId"</span>:<span class="s">"1"</span>, <span class="k">"base"</span>:<span class="s">"0x…"</span>, <span class="k">"quote"</span>:<span class="s">"0x55d3…7955"</span>,
+  <span class="k">"baseSymbol"</span>:<span class="s">"DEMO"</span>, <span class="k">"quoteSymbol"</span>:<span class="s">"USDT"</span>, <span class="k">"baseDecimals"</span>:18, <span class="k">"quoteDecimals"</span>:18,
+  <span class="k">"tick"</span>:0.01, <span class="k">"tickNum"</span>:<span class="s">"1"</span>, <span class="k">"tickDen"</span>:<span class="s">"100"</span>,
+  <span class="k">"minBaseQty"</span>:<span class="s">"0"</span>, <span class="k">"minNotional"</span>:<span class="s">"0"</span>,
+  <span class="k">"takerFeeBps"</span>:10, <span class="k">"makerFeeBps"</span>:0, <span class="k">"buyTaxBps"</span>:0, <span class="k">"sellTaxBps"</span>:0,
+  <span class="k">"openTime"</span>:1793988678, <span class="k">"isOpen"</span>:false, <span class="k">"paused"</span>:false,
+  <span class="k">"logo"</span>:null, <span class="k">"displayName"</span>:<span class="s">"Demo Coin"</span>, <span class="k">"listingComplete"</span>:true, <span class="k">"openOrders"</span>:0
+}]</pre>
+      </div>
+    </section>
+
+    <section id="book">
+      <div data-lang="zh">
+        <h2>盘口</h2>
+        <div class="ep"><div class="ep-head"><span class="m get">GET</span><span class="path">/book?pairId=1</span><span class="auth">无鉴权</span></div><div class="ep-desc">仅链上锁仓单（A 单）聚合盘口。返回 <code class="inl">{pairId, bids:[{price,qty}], asks:[{price,qty}], updatedAt}</code>。</div></div>
+        <div class="ep"><div class="ep-head"><span class="m get">GET</span><span class="path">/mixed-book?pairId=1</span><span class="auth">无鉴权</span></div><div class="ep-desc">合并盘口：链上锁仓单（A 单）+ 做市商签名单（B 单），每档带来源标记。交易页用此接口。</div></div>
+        <table>
+          <tr><th>字段</th><th>说明</th></tr>
+          <tr><td>bids / asks</td><td class="d">每档 {price, qty, src}；src 为 onchain / signed / onchain+signed</td></tr>
+          <tr><td>signedQuotes</td><td class="d">当前签名池内报价条数</td></tr>
+          <tr><td>updatedAt</td><td class="d">生成时间戳（毫秒）</td></tr>
+        </table>
+        <pre>GET /api/mixed-book?pairId=1
+
+{
+  <span class="k">"pairId"</span>:<span class="s">"1"</span>,
+  <span class="k">"bids"</span>:[{<span class="k">"price"</span>:0.24, <span class="k">"qty"</span>:1200, <span class="k">"src"</span>:<span class="s">"signed"</span>}],
+  <span class="k">"asks"</span>:[{<span class="k">"price"</span>:0.26, <span class="k">"qty"</span>:900, <span class="k">"src"</span>:<span class="s">"onchain+signed"</span>}],
+  <span class="k">"signedQuotes"</span>:42, <span class="k">"updatedAt"</span>:1730990000000
+}</pre>
+        <div class="ep"><div class="ep-head"><span class="m get">GET</span><span class="path">/open-orders?pairId=1</span><span class="auth">无鉴权</span></div><div class="ep-desc">带订单 id 的全部有效挂单，供撮合 / 做市对账。返回 <code class="inl">{pairId, orders:[{id, side, price, remainingBaseQty, seq}]}</code>。</div></div>
+      </div>
+      <div data-lang="en">
+        <h2>Order book</h2>
+        <div class="ep"><div class="ep-head"><span class="m get">GET</span><span class="path">/book?pairId=1</span><span class="auth">no auth</span></div><div class="ep-desc">On-chain escrowed orders (A-orders) only. Returns <code class="inl">{pairId, bids:[{price,qty}], asks:[{price,qty}], updatedAt}</code>.</div></div>
+        <div class="ep"><div class="ep-head"><span class="m get">GET</span><span class="path">/mixed-book?pairId=1</span><span class="auth">no auth</span></div><div class="ep-desc">Merged book: on-chain A-orders + maker signed B-orders, each level tagged by source. Used by the trade UI.</div></div>
+        <table>
+          <tr><th>field</th><th>meaning</th></tr>
+          <tr><td>bids / asks</td><td class="d">per level {price, qty, src}; src is onchain / signed / onchain+signed</td></tr>
+          <tr><td>signedQuotes</td><td class="d">quotes currently in the signed pool</td></tr>
+          <tr><td>updatedAt</td><td class="d">generation timestamp (ms)</td></tr>
+        </table>
+        <pre>GET /api/mixed-book?pairId=1
+
+{
+  <span class="k">"pairId"</span>:<span class="s">"1"</span>,
+  <span class="k">"bids"</span>:[{<span class="k">"price"</span>:0.24, <span class="k">"qty"</span>:1200, <span class="k">"src"</span>:<span class="s">"signed"</span>}],
+  <span class="k">"asks"</span>:[{<span class="k">"price"</span>:0.26, <span class="k">"qty"</span>:900, <span class="k">"src"</span>:<span class="s">"onchain+signed"</span>}],
+  <span class="k">"signedQuotes"</span>:42, <span class="k">"updatedAt"</span>:1730990000000
+}</pre>
+        <div class="ep"><div class="ep-head"><span class="m get">GET</span><span class="path">/open-orders?pairId=1</span><span class="auth">no auth</span></div><div class="ep-desc">All live open orders with ids, for matching / MM reconciliation. Returns <code class="inl">{pairId, orders:[{id, side, price, remainingBaseQty, seq}]}</code>.</div></div>
+      </div>
+    </section>
+
+    <section id="market">
+      <div data-lang="zh">
+        <h2>成交 · K 线 · 订单</h2>
+        <div class="ep"><div class="ep-head"><span class="m get">GET</span><span class="path">/trades?pairId=1&amp;limit=50</span><span class="auth">无鉴权</span></div><div class="ep-desc">最近成交。返回 <code class="inl">{trades:[{price, qty, cost, fee, taker, txHash, block}]}</code>（qty/cost/fee 为最小单位字符串）。</div></div>
+        <div class="ep"><div class="ep-head"><span class="m get">GET</span><span class="path">/candles?pairId=1&amp;limit=200&amp;bucketBlocks=50</span><span class="auth">无鉴权</span></div><div class="ep-desc">K 线，由链上成交按区块桶聚合，非外部行情源。返回 <code class="inl">{candles:[{t,o,h,l,c,v}], source:"fills", bucketBlocks}</code>，t 为桶首区块号。</div></div>
+        <div class="ep"><div class="ep-head"><span class="m get">GET</span><span class="path">/orders?owner=0x…</span><span class="auth">无鉴权</span></div><div class="ep-desc">某地址的全部订单（跨交易对）。<b>owner 必填</b>。返回 <code class="inl">{orders:[{id, pairId, side, price, originalBaseQty, remainingBaseQty, status}]}</code>。</div></div>
+      </div>
+      <div data-lang="en">
+        <h2>Trades · Candles · Orders</h2>
+        <div class="ep"><div class="ep-head"><span class="m get">GET</span><span class="path">/trades?pairId=1&amp;limit=50</span><span class="auth">no auth</span></div><div class="ep-desc">Recent trades. Returns <code class="inl">{trades:[{price, qty, cost, fee, taker, txHash, block}]}</code> (qty/cost/fee are smallest-unit strings).</div></div>
+        <div class="ep"><div class="ep-head"><span class="m get">GET</span><span class="path">/candles?pairId=1&amp;limit=200&amp;bucketBlocks=50</span><span class="auth">no auth</span></div><div class="ep-desc">Candles aggregated from on-chain fills by block bucket, not an external feed. Returns <code class="inl">{candles:[{t,o,h,l,c,v}], source:"fills", bucketBlocks}</code>; t is the bucket's first block number.</div></div>
+        <div class="ep"><div class="ep-head"><span class="m get">GET</span><span class="path">/orders?owner=0x…</span><span class="auth">no auth</span></div><div class="ep-desc">All orders for an address (across pairs). <b>owner is required</b>. Returns <code class="inl">{orders:[{id, pairId, side, price, originalBaseQty, remainingBaseQty, status}]}</code>.</div></div>
+      </div>
+    </section>
+
+    <section id="aggregator">
+      <div data-lang="zh">
+        <h2>聚合商标准数据</h2>
+        <p>供 DexScreener / GeckoTerminal / DefiLlama / CoinGecko / CMC 收录的订单簿型交易所标准接口。<code class="inl">ticker_id</code> 规则为 <code class="inl">BASE_USDT</code>（符号大写）。只读、轻量缓存。</p>
+        <div class="ep"><div class="ep-head"><span class="m get">GET</span><span class="path">/public/pairs</span></div><div class="ep-desc">[{ticker_id, base, target, pool_id}]</div></div>
+        <div class="ep"><div class="ep-head"><span class="m get">GET</span><span class="path">/public/tickers</span></div><div class="ep-desc">[{ticker_id, base_currency, target_currency, pool_id, last_price, base_volume, target_volume, bid, ask, high, low, price_change_percent}]，量为近 24h。</div></div>
+        <div class="ep"><div class="ep-head"><span class="m get">GET</span><span class="path">/public/stats</span></div><div class="ep-desc">平台概览：{tvl, volume24h, pairs, updatedAt}。仅统计已完成上币的对，tvl 以 USDT 计。</div></div>
+        <div class="ep"><div class="ep-head"><span class="m get">GET</span><span class="path">/public/orderbook?ticker_id=BASE_USDT&amp;depth=100</span></div><div class="ep-desc">{ticker_id, timestamp, bids:[["price","qty"]], asks:[["price","qty"]]}，depth 上限 500。</div></div>
+        <div class="ep"><div class="ep-head"><span class="m get">GET</span><span class="path">/public/historical_trades?ticker_id=BASE_USDT&amp;type=buy&amp;limit=200</span></div><div class="ep-desc">[{trade_id, price, base_volume, target_volume, trade_timestamp, type}]，type 可选 buy/sell，limit 上限 1000。</div></div>
+        <pre>GET /api/public/tickers
+
+[{
+  <span class="k">"ticker_id"</span>:<span class="s">"DEMO_USDT"</span>, <span class="k">"base_currency"</span>:<span class="s">"DEMO"</span>, <span class="k">"target_currency"</span>:<span class="s">"USDT"</span>, <span class="k">"pool_id"</span>:<span class="s">"1"</span>,
+  <span class="k">"last_price"</span>:0.25, <span class="k">"base_volume"</span>:1200, <span class="k">"target_volume"</span>:300,
+  <span class="k">"bid"</span>:0.24, <span class="k">"ask"</span>:0.26, <span class="k">"high"</span>:0.27, <span class="k">"low"</span>:0.23, <span class="k">"price_change_percent"</span>:4.1
+}]</pre>
+      </div>
+      <div data-lang="en">
+        <h2>Aggregator feed</h2>
+        <p>Standard order-book exchange feeds for DexScreener / GeckoTerminal / DefiLlama / CoinGecko / CMC. <code class="inl">ticker_id</code> is <code class="inl">BASE_USDT</code> (upper-cased symbols). Read-only, lightly cached.</p>
+        <div class="ep"><div class="ep-head"><span class="m get">GET</span><span class="path">/public/pairs</span></div><div class="ep-desc">[{ticker_id, base, target, pool_id}]</div></div>
+        <div class="ep"><div class="ep-head"><span class="m get">GET</span><span class="path">/public/tickers</span></div><div class="ep-desc">[{ticker_id, base_currency, target_currency, pool_id, last_price, base_volume, target_volume, bid, ask, high, low, price_change_percent}]; 24h volumes.</div></div>
+        <div class="ep"><div class="ep-head"><span class="m get">GET</span><span class="path">/public/stats</span></div><div class="ep-desc">Platform overview: {tvl, volume24h, pairs, updatedAt}. Counts completed listings only; tvl in USDT.</div></div>
+        <div class="ep"><div class="ep-head"><span class="m get">GET</span><span class="path">/public/orderbook?ticker_id=BASE_USDT&amp;depth=100</span></div><div class="ep-desc">{ticker_id, timestamp, bids:[["price","qty"]], asks:[["price","qty"]]}; depth capped at 500.</div></div>
+        <div class="ep"><div class="ep-head"><span class="m get">GET</span><span class="path">/public/historical_trades?ticker_id=BASE_USDT&amp;type=buy&amp;limit=200</span></div><div class="ep-desc">[{trade_id, price, base_volume, target_volume, trade_timestamp, type}]; type is buy/sell, limit capped at 1000.</div></div>
+        <pre>GET /api/public/tickers
+
+[{
+  <span class="k">"ticker_id"</span>:<span class="s">"DEMO_USDT"</span>, <span class="k">"base_currency"</span>:<span class="s">"DEMO"</span>, <span class="k">"target_currency"</span>:<span class="s">"USDT"</span>, <span class="k">"pool_id"</span>:<span class="s">"1"</span>,
+  <span class="k">"last_price"</span>:0.25, <span class="k">"base_volume"</span>:1200, <span class="k">"target_volume"</span>:300,
+  <span class="k">"bid"</span>:0.24, <span class="k">"ask"</span>:0.26, <span class="k">"high"</span>:0.27, <span class="k">"low"</span>:0.23, <span class="k">"price_change_percent"</span>:4.1
+}]</pre>
+      </div>
+    </section>
+
+    <section id="token">
+      <div data-lang="zh">
+        <h2>代币检测</h2>
+        <div class="ep"><div class="ep-head"><span class="m get">GET</span><span class="path">/token-meta?token=0x…</span><span class="auth">无鉴权</span></div><div class="ep-desc">链上名称 / 符号 / 精度 / 总量 + logo 候选链接 + 安全检测结论。返回 <code class="inl">{token, name, symbol, decimals, totalSupply, logoCandidates, verdict, risks, summary}</code>。</div></div>
+        <div class="ep"><div class="ep-head"><span class="m get">GET</span><span class="path">/scan-token?token=0x…</span><span class="auth">无鉴权</span></div><div class="ep-desc">完整安全检测报告：抽税 / 蜜罐、黑名单、可增发、可暂停、可升级、持仓集中度等风险项与结论（verdict: pass / review / block）。只读，不花 gas。</div></div>
+        <pre>GET /api/token-meta?token=0x0E09…cE82
+
+{
+  <span class="k">"token"</span>:<span class="s">"0x0E09…cE82"</span>, <span class="k">"name"</span>:<span class="s">"PancakeSwap Token"</span>, <span class="k">"symbol"</span>:<span class="s">"Cake"</span>,
+  <span class="k">"decimals"</span>:18, <span class="k">"totalSupply"</span>:<span class="s">"…"</span>, <span class="k">"logoCandidates"</span>:[<span class="s">"https://…/logo.png"</span>],
+  <span class="k">"verdict"</span>:<span class="s">"pass"</span>, <span class="k">"risks"</span>:[]
+}</pre>
+        <div class="note warn">检测为只读启发式，不覆盖全部攻击面（如成交后才开启的黑名单），请自行复核。</div>
+      </div>
+      <div data-lang="en">
+        <h2>Token checks</h2>
+        <div class="ep"><div class="ep-head"><span class="m get">GET</span><span class="path">/token-meta?token=0x…</span><span class="auth">no auth</span></div><div class="ep-desc">On-chain name / symbol / decimals / supply + candidate logo URLs + safety verdict. Returns <code class="inl">{token, name, symbol, decimals, totalSupply, logoCandidates, verdict, risks, summary}</code>.</div></div>
+        <div class="ep"><div class="ep-head"><span class="m get">GET</span><span class="path">/scan-token?token=0x…</span><span class="auth">no auth</span></div><div class="ep-desc">Full safety report: transfer tax / honeypot, blacklist, mintable, pausable, upgradeable, holder concentration, with a verdict (pass / review / block). Read-only, no gas.</div></div>
+        <pre>GET /api/token-meta?token=0x0E09…cE82
+
+{
+  <span class="k">"token"</span>:<span class="s">"0x0E09…cE82"</span>, <span class="k">"name"</span>:<span class="s">"PancakeSwap Token"</span>, <span class="k">"symbol"</span>:<span class="s">"Cake"</span>,
+  <span class="k">"decimals"</span>:18, <span class="k">"totalSupply"</span>:<span class="s">"…"</span>, <span class="k">"logoCandidates"</span>:[<span class="s">"https://…/logo.png"</span>],
+  <span class="k">"verdict"</span>:<span class="s">"pass"</span>, <span class="k">"risks"</span>:[]
+}</pre>
+        <div class="note warn">The scan is a read-only heuristic and does not cover every attack (e.g. a blacklist switched on only after trading). Verify independently.</div>
+      </div>
+    </section>
+
+    <section id="ws">
+      <div data-lang="zh">
+        <h2>WebSocket</h2>
+        <div class="ep"><div class="ep-head"><span class="m ws">WS</span><span class="path">/ws</span><span class="auth">无鉴权</span></div><div class="ep-desc">实时推送，无需轮询。消息有三种：<code class="inl">{type:"hello", …统计}</code>（连接成功即收，重连后也会收到）；<code class="inl">{type:"update", block, pairs}</code>（盘口、成交或做市报价有变化；<code>pairs</code> 是受影响的交易对 id 数组，<code>null</code> 表示全部），收到后再用 REST 拉取你关心的数据；<code class="inl">{type:"hb"}</code>（每 25 秒一次心跳，超过 70 秒没收到任何消息请主动重连）。同一 IP 最多 20 条连接；断线请指数退避重连，重连成功后先拉一次最新数据以补上断线期间的变化。</div></div>
+        <pre>const ws = new WebSocket(<span class="s">"wss://sordexpro.com/api/ws"</span>);
+ws.onmessage = (e) =&gt; {
+  const ev = JSON.parse(e.data);
+  <span class="c">// { type:"hello" } | { type:"update", block, pairs:["1"]|null } | { type:"hb" }</span>
+  if (ev.type === "update") { <span class="c">/* 再用 REST 拉取变化的数据 */</span> }
+};</pre>
+      </div>
+      <div data-lang="en">
+        <h2>WebSocket</h2>
+        <div class="ep"><div class="ep-head"><span class="m ws">WS</span><span class="path">/ws</span><span class="auth">no auth</span></div><div class="ep-desc">Live push, so you do not need to poll. Three message types: <code class="inl">{type:"hello", …stats}</code> (sent on connect, and again after a reconnect); <code class="inl">{type:"update", block, pairs}</code> (the book, trades or maker quotes changed; <code>pairs</code> is an array of affected pair ids, <code>null</code> means all) &ndash; fetch what you need over REST when it arrives; and <code class="inl">{type:"hb"}</code> (a heartbeat every 25 seconds; if you receive nothing for 70 seconds, reconnect). At most 20 connections per IP. Reconnect with exponential backoff, and refetch the latest data once after reconnecting to cover the gap.</div></div>
+        <pre>const ws = new WebSocket(<span class="s">"wss://sordexpro.com/api/ws"</span>);
+ws.onmessage = (e) =&gt; {
+  const ev = JSON.parse(e.data);
+  <span class="c">// { type:"hello" } | { type:"update", block, pairs:["1"]|null } | { type:"hb" }</span>
+  if (ev.type === "update") { <span class="c">/* then fetch the changed data over REST */</span> }
+};</pre>
+      </div>
+    </section>
+
+    <section id="mm-model">
+      <div data-lang="zh">
+        <h2>做市商接入模型</h2>
+        <p>做市商有两种资金托管模式，报价准入规则不同：</p>
+        <ul>
+          <li><b>金库做市（VAULT）</b>：把流动性充入 <code class="inl">MMCollateralVault</code>。该 maker 在对应交易对金库有可用余额时，报价无需 API Key。</li>
+          <li><b>授权额度做市（ALLOWANCE）</b>：资金留在钱包、只对合约 approve。此模式报价<b>必须带 API Key</b>。</li>
+        </ul>
+        <p>API Key 为自助申领：用资金地址 EIP-712 签名即时领取，绑定 maker 地址 + IP 白名单。Key 只是报价准入凭证，<b>不托管资金、不能提现、不能替别的地址报价</b>。详见 <a href="#admission">报价准入</a>。</p>
+      </div>
+      <div data-lang="en">
+        <h2>Market-making access model</h2>
+        <p>Makers run under one of two custody modes, with different quote-admission rules:</p>
+        <ul>
+          <li><b>Vault custody (VAULT)</b>: deposit liquidity into <code class="inl">MMCollateralVault</code>. When the maker has available balance in the pair's vault, quoting needs no API key.</li>
+          <li><b>Allowance custody (ALLOWANCE)</b>: funds stay in the wallet with an on-chain approval. Quoting in this mode <b>requires an API key</b>.</li>
+        </ul>
+        <p>Keys are self-issued: sign once with EIP-712 from the funding address to receive one, bound to the maker address + an IP allowlist. A key is a quote-admission credential only — it <b>custodies no funds, cannot withdraw, and cannot quote for another address</b>. See <a href="#admission">quote admission</a>.</p>
+      </div>
+    </section>
+
+    <section id="mm-key">
+      <div data-lang="zh">
+        <h3>申领与轮换 Key</h3>
+        <div class="ep"><div class="ep-head"><span class="m post">POST</span><span class="path">/mm/issue</span><span class="auth">EIP-712 签名</span></div><div class="ep-desc">自助申领 API Key。同一 maker 再次申领即轮换，旧 Key 立即失效、其在池旧报价一并清除。明文 Key 仅此一次返回。</div></div>
+        <table>
+          <tr><th>字段</th><th>说明</th></tr>
+          <tr><td>maker</td><td class="d">资金地址</td></tr>
+          <tr><td>ips</td><td class="d">IP 白名单数组（精确 IPv4、IPv4 CIDR（如 1.2.3.0/24）或精确 IPv6 地址，暂不支持 IPv6 CIDR；1~20 条）</td></tr>
+          <tr><td>signature</td><td class="d">对 MMAccess（action="issue"）的 EIP-712 签名，见 <a href="#eip712">EIP-712</a></td></tr>
+          <tr><td>deadline / nonce</td><td class="d">签名有效期（秒）/ 防重放随机数</td></tr>
+          <tr><td>label / contactEmail</td><td class="d">可选，备注与联系邮箱</td></tr>
+        </table>
+        <pre>POST /api/mm/issue
+{
+  <span class="k">"maker"</span>:<span class="s">"0x…"</span>, <span class="k">"ips"</span>:[<span class="s">"203.0.113.7"</span>,<span class="s">"198.51.100.0/24"</span>],
+  <span class="k">"signature"</span>:<span class="s">"0x…"</span>, <span class="k">"deadline"</span>:1731000000, <span class="k">"nonce"</span>:<span class="s">"1"</span>
+}
+
+200  → { <span class="k">"ok"</span>:true, <span class="k">"apiKey"</span>:<span class="s">"sdx_mk_…"</span>, <span class="k">"status"</span>:<span class="s">"active"</span>, <span class="k">"allowedIps"</span>:[…] }</pre>
+        <div class="note">合约金库（资金地址为合约）可由其已 <code class="inl">setAgent</code> 授权的代理地址代签申领；后端对 maker 做 <code class="inl">isAuthorizedAgent</code> 校验。</div>
+      </div>
+      <div data-lang="en">
+        <h3>Issue &amp; rotate key</h3>
+        <div class="ep"><div class="ep-head"><span class="m post">POST</span><span class="path">/mm/issue</span><span class="auth">EIP-712 sig</span></div><div class="ep-desc">Self-issue an API key. Issuing again for the same maker rotates it — the old key dies instantly and its pooled quotes are cleared. The plaintext key is returned once.</div></div>
+        <table>
+          <tr><th>field</th><th>meaning</th></tr>
+          <tr><td>maker</td><td class="d">funding address</td></tr>
+          <tr><td>ips</td><td class="d">IP allowlist array (exact IPv4, IPv4 CIDR such as 1.2.3.0/24, or an exact IPv6 address; IPv6 CIDR is not supported yet; 1–20 entries)</td></tr>
+          <tr><td>signature</td><td class="d">EIP-712 signature over MMAccess (action="issue"); see <a href="#eip712">EIP-712</a></td></tr>
+          <tr><td>deadline / nonce</td><td class="d">signature expiry (sec) / anti-replay nonce</td></tr>
+          <tr><td>label / contactEmail</td><td class="d">optional label and contact email</td></tr>
+        </table>
+        <pre>POST /api/mm/issue
+{
+  <span class="k">"maker"</span>:<span class="s">"0x…"</span>, <span class="k">"ips"</span>:[<span class="s">"203.0.113.7"</span>,<span class="s">"198.51.100.0/24"</span>],
+  <span class="k">"signature"</span>:<span class="s">"0x…"</span>, <span class="k">"deadline"</span>:1731000000, <span class="k">"nonce"</span>:<span class="s">"1"</span>
+}
+
+200  → { <span class="k">"ok"</span>:true, <span class="k">"apiKey"</span>:<span class="s">"sdx_mk_…"</span>, <span class="k">"status"</span>:<span class="s">"active"</span>, <span class="k">"allowedIps"</span>:[…] }</pre>
+        <div class="note">A contract vault (funding address is a contract) may have the key issued by an agent it has authorized via <code class="inl">setAgent</code>; the backend verifies <code class="inl">isAuthorizedAgent</code> against the maker.</div>
+      </div>
+    </section>
+
+    <section id="mm-ips">
+      <div data-lang="zh">
+        <h3>IP 白名单</h3>
+        <div class="ep"><div class="ep-head"><span class="m post">POST</span><span class="path">/mm/update-ips</span><span class="auth">EIP-712 签名</span></div><div class="ep-desc">更新 IP 白名单而不轮换 Key。需对 MMAccess（action="update-ip"）重新签名。</div></div>
+        <pre>POST /api/mm/update-ips
+{ <span class="k">"maker"</span>:<span class="s">"0x…"</span>, <span class="k">"ips"</span>:[<span class="s">"203.0.113.7"</span>], <span class="k">"signature"</span>:<span class="s">"0x…"</span>, <span class="k">"deadline"</span>:1731000000, <span class="k">"nonce"</span>:<span class="s">"2"</span> }
+
+200  → { <span class="k">"ok"</span>:true, <span class="k">"allowedIps"</span>:[<span class="s">"203.0.113.7"</span>] }</pre>
+      </div>
+      <div data-lang="en">
+        <h3>IP allowlist</h3>
+        <div class="ep"><div class="ep-head"><span class="m post">POST</span><span class="path">/mm/update-ips</span><span class="auth">EIP-712 sig</span></div><div class="ep-desc">Update the IP allowlist without rotating the key. Requires a fresh signature over MMAccess (action="update-ip").</div></div>
+        <pre>POST /api/mm/update-ips
+{ <span class="k">"maker"</span>:<span class="s">"0x…"</span>, <span class="k">"ips"</span>:[<span class="s">"203.0.113.7"</span>], <span class="k">"signature"</span>:<span class="s">"0x…"</span>, <span class="k">"deadline"</span>:1731000000, <span class="k">"nonce"</span>:<span class="s">"2"</span> }
+
+200  → { <span class="k">"ok"</span>:true, <span class="k">"allowedIps"</span>:[<span class="s">"203.0.113.7"</span>] }</pre>
+      </div>
+    </section>
+
+    <section id="mm-status">
+      <div data-lang="zh">
+        <h3>Key 状态</h3>
+        <div class="ep"><div class="ep-head"><span class="m get">GET</span><span class="path">/mm/key-status?maker=0x…</span><span class="auth">公开 / x-mm-key</span></div><div class="ep-desc">查询某地址是否已有可用的 API Key，不返回明文 Key。IP 白名单 <code class="inl">allowedIps</code> 只在请求头带上该地址自己的 <code class="inl">x-mm-key</code> 时返回。</div></div>
+        <pre>200  → { <span class="k">"status"</span>:<span class="s">"active"</span>|<span class="s">"banned"</span>|<span class="s">"none"</span>, <span class="k">"hasKey"</span>:true, <span class="k">"allowedIps"</span>:[…], <span class="k">"required"</span>:true }</pre>
+        <p><code class="inl">required</code> 表示当前平台是否强制报价带 Key。</p>
+      </div>
+      <div data-lang="en">
+        <h3>Key status</h3>
+        <div class="ep"><div class="ep-head"><span class="m get">GET</span><span class="path">/mm/key-status?maker=0x…</span><span class="auth">public / x-mm-key</span></div><div class="ep-desc">Check whether an address has an active API key; never returns the plaintext key. The IP allowlist (<code class="inl">allowedIps</code>) is only returned when the request carries that address's own <code class="inl">x-mm-key</code>.</div></div>
+        <pre>200  → { <span class="k">"status"</span>:<span class="s">"active"</span>|<span class="s">"banned"</span>|<span class="s">"none"</span>, <span class="k">"hasKey"</span>:true, <span class="k">"allowedIps"</span>:[…], <span class="k">"required"</span>:true }</pre>
+        <p><code class="inl">required</code> indicates whether the platform currently enforces a key for quoting.</p>
+      </div>
+    </section>
+
+    <section id="mm-exposure">
+      <div data-lang="zh">
+        <h3>做市预算与指标</h3>
+        <div class="ep"><div class="ep-head"><span class="m get">GET</span><span class="path">/mm/exposure?maker=0x…&amp;pairId=1</span><span class="auth">x-mm-key（仅本人）</span></div><div class="ep-desc">某 maker 在某对的托管模式与可用做市预算。baseBudget=卖单可挂上限（base wei），quoteBudget=买单可挂上限（quote wei）。</div></div>
+        <pre>200  → {
+  <span class="k">"maker"</span>:<span class="s">"0x…"</span>, <span class="k">"pairId"</span>:<span class="s">"1"</span>, <span class="k">"custody"</span>:<span class="s">"vault"</span>|<span class="s">"allowance"</span>,
+  <span class="k">"base"</span>:<span class="s">"0x…"</span>, <span class="k">"quote"</span>:<span class="s">"0x…"</span>, <span class="k">"baseBudget"</span>:<span class="s">"…"</span>, <span class="k">"quoteBudget"</span>:<span class="s">"…"</span>
+}</pre>
+        <div class="ep"><div class="ep-head"><span class="m get">GET</span><span class="path">/mm-metrics?pairId=1&amp;owner=0x…&amp;bandBps=200</span><span class="auth">无鉴权</span></div><div class="ep-desc">做市考核指标：中间价、价差、价带内双边深度、是否双边，以及该地址自己的报价覆盖。</div></div>
+        <pre>200  → {
+  <span class="k">"pairId"</span>:<span class="s">"1"</span>, <span class="k">"mid"</span>:0.25, <span class="k">"spreadBps"</span>:80, <span class="k">"bestBid"</span>:0.24, <span class="k">"bestAsk"</span>:0.26,
+  <span class="k">"bidDepth"</span>:1200, <span class="k">"askDepth"</span>:900, <span class="k">"twoSided"</span>:true, <span class="k">"bandBps"</span>:200,
+  <span class="k">"owner"</span>:<span class="s">"0x…"</span>, <span class="k">"ownerBidOrders"</span>:5, <span class="k">"ownerAskOrders"</span>:5, <span class="k">"ownerOpenOrders"</span>:10, <span class="k">"ownerTwoSided"</span>:true
+}</pre>
+      </div>
+      <div data-lang="en">
+        <h3>Budget &amp; metrics</h3>
+        <div class="ep"><div class="ep-head"><span class="m get">GET</span><span class="path">/mm/exposure?maker=0x…&amp;pairId=1</span><span class="auth">x-mm-key (own address only)</span></div><div class="ep-desc">A maker's custody mode and available quoting budget for a pair. baseBudget = max sell size (base wei), quoteBudget = max buy size (quote wei).</div></div>
+        <pre>200  → {
+  <span class="k">"maker"</span>:<span class="s">"0x…"</span>, <span class="k">"pairId"</span>:<span class="s">"1"</span>, <span class="k">"custody"</span>:<span class="s">"vault"</span>|<span class="s">"allowance"</span>,
+  <span class="k">"base"</span>:<span class="s">"0x…"</span>, <span class="k">"quote"</span>:<span class="s">"0x…"</span>, <span class="k">"baseBudget"</span>:<span class="s">"…"</span>, <span class="k">"quoteBudget"</span>:<span class="s">"…"</span>
+}</pre>
+        <div class="ep"><div class="ep-head"><span class="m get">GET</span><span class="path">/mm-metrics?pairId=1&amp;owner=0x…&amp;bandBps=200</span><span class="auth">no auth</span></div><div class="ep-desc">MM metrics: mid, spread, in-band two-sided depth, whether two-sided, and the address's own quote coverage.</div></div>
+        <pre>200  → {
+  <span class="k">"pairId"</span>:<span class="s">"1"</span>, <span class="k">"mid"</span>:0.25, <span class="k">"spreadBps"</span>:80, <span class="k">"bestBid"</span>:0.24, <span class="k">"bestAsk"</span>:0.26,
+  <span class="k">"bidDepth"</span>:1200, <span class="k">"askDepth"</span>:900, <span class="k">"twoSided"</span>:true, <span class="k">"bandBps"</span>:200,
+  <span class="k">"owner"</span>:<span class="s">"0x…"</span>, <span class="k">"ownerBidOrders"</span>:5, <span class="k">"ownerAskOrders"</span>:5, <span class="k">"ownerOpenOrders"</span>:10, <span class="k">"ownerTwoSided"</span>:true
+}</pre>
+      </div>
+    </section>
+
+    <section id="mm-hosted">
+      <div data-lang="zh">
+        <h2>托管做市</h2>
+        <p>做市商把流动性充入金库并对平台代理授权后，由平台常驻机器人替其增量布单。订阅 / 退订均需 maker 本人 EIP-712 签名。</p>
+        <div class="ep"><div class="ep-head"><span class="m get">GET</span><span class="path">/mm/agent</span><span class="auth">无鉴权</span></div><div class="ep-desc">平台托管机器人的代理地址，供前端 <code class="inl">setAgent</code> 授权用。返回 <code class="inl">{agent, enabled}</code>。</div></div>
+        <div class="ep"><div class="ep-head"><span class="m post">POST</span><span class="path">/mm/subscribe</span><span class="auth">EIP-712 签名</span></div><div class="ep-desc">订阅托管做市。前置：① 已对 <code class="inl">/mm/agent</code> 返回的代理地址 <code class="inl">setAgent</code> 授权（后端链上校验）；② VAULT 模式需该交易对金库里已有做市资金，USDT 可用额或按固定价折算的 base 至少 <b>1 USDT</b>，否则返回 400；③ 被平台停用的地址返回 403。</div></div>
+        <table>
+          <tr><th>字段</th><th>说明</th></tr>
+          <tr><td>maker / pairId</td><td class="d">资金地址 / 交易对</td></tr>
+          <tr><td>params.priceSource</td><td class="d">锚价来源：fixed / binance（book 已停用：以自家盘口为锚容易被尘埃单拖偏）</td></tr>
+          <tr><td>params.fixedPrice</td><td class="d">固定锚价（priceSource=fixed 时）</td></tr>
+          <tr><td>params.binanceSymbol</td><td class="d">外部行情符号（priceSource=binance 时）</td></tr>
+          <tr><td>params.levels</td><td class="d">单边挂单档数（1~20）</td></tr>
+          <tr><td>params.halfSpreadBps</td><td class="d">半价差（基点，1~2000）</td></tr>
+          <tr><td>params.rangeWidthBps</td><td class="d">布单价格带宽（基点，10~5000）</td></tr>
+          <tr><td>signature / deadline / nonce</td><td class="d">对 MMSubscribe 的 EIP-712 签名，见 <a href="#eip712">EIP-712</a></td></tr>
+        </table>
+        <pre>POST /api/mm/subscribe
+{
+  <span class="k">"maker"</span>:<span class="s">"0x…"</span>, <span class="k">"pairId"</span>:<span class="s">"1"</span>,
+  <span class="k">"params"</span>:{ <span class="k">"priceSource"</span>:<span class="s">"binance"</span>, <span class="k">"binanceSymbol"</span>:<span class="s">"CAKEUSDT"</span>, <span class="k">"levels"</span>:10, <span class="k">"halfSpreadBps"</span>:30, <span class="k">"rangeWidthBps"</span>:300 },
+  <span class="k">"signature"</span>:<span class="s">"0x…"</span>, <span class="k">"deadline"</span>:1731000000, <span class="k">"nonce"</span>:<span class="s">"1"</span>
+}
+
+200  → { <span class="k">"ok"</span>:true, <span class="k">"subscription"</span>:{…} }</pre>
+        <div class="ep"><div class="ep-head"><span class="m post">POST</span><span class="path">/mm/unsubscribe</span><span class="auth">EIP-712 签名</span></div><div class="ep-desc">取消托管做市。需对 MMUnsubscribe 签名。返回 <code class="inl">{ok, removed}</code>；该交易对没有订阅时返回 404。</div></div>
+        <div class="ep"><div class="ep-head"><span class="m get">GET</span><span class="path">/mm/subscriptions?maker=0x…</span><span class="auth">x-mm-key（仅本人）</span></div><div class="ep-desc">查询某做市商的托管订阅。返回 <code class="inl">{subscriptions:[…]}</code>。</div></div>
+      </div>
+      <div data-lang="en">
+        <h2>Hosted market making</h2>
+        <p>Once a maker funds the vault and authorizes the platform agent, the platform's resident bot quotes incrementally on its behalf. Subscribe and unsubscribe both require the maker's own EIP-712 signature.</p>
+        <div class="ep"><div class="ep-head"><span class="m get">GET</span><span class="path">/mm/agent</span><span class="auth">no auth</span></div><div class="ep-desc">The platform bot's agent address for the frontend <code class="inl">setAgent</code> call. Returns <code class="inl">{agent, enabled}</code>.</div></div>
+        <div class="ep"><div class="ep-head"><span class="m post">POST</span><span class="path">/mm/subscribe</span><span class="auth">EIP-712 sig</span></div><div class="ep-desc">Subscribe to hosted MM. Preconditions: (1) the agent from <code class="inl">/mm/agent</code> must already be authorized via <code class="inl">setAgent</code> (checked on-chain); (2) in VAULT mode the pair's vault must already hold market-making funds worth at least <b>1 USDT</b> (available USDT, or base valued at the fixed price), otherwise 400; (3) addresses suspended by the platform get 403.</div></div>
+        <table>
+          <tr><th>field</th><th>meaning</th></tr>
+          <tr><td>maker / pairId</td><td class="d">funding address / pair</td></tr>
+          <tr><td>params.priceSource</td><td class="d">anchor price source: fixed / binance ("book" is no longer accepted: anchoring on our own book can be pushed by tiny orders)</td></tr>
+          <tr><td>params.fixedPrice</td><td class="d">fixed anchor price (when priceSource=fixed)</td></tr>
+          <tr><td>params.binanceSymbol</td><td class="d">external feed symbol (when priceSource=binance)</td></tr>
+          <tr><td>params.levels</td><td class="d">levels per side (1–20)</td></tr>
+          <tr><td>params.halfSpreadBps</td><td class="d">half spread in bps (1–2000)</td></tr>
+          <tr><td>params.rangeWidthBps</td><td class="d">ladder price-band width in bps (10–5000)</td></tr>
+          <tr><td>signature / deadline / nonce</td><td class="d">EIP-712 signature over MMSubscribe; see <a href="#eip712">EIP-712</a></td></tr>
+        </table>
+        <pre>POST /api/mm/subscribe
+{
+  <span class="k">"maker"</span>:<span class="s">"0x…"</span>, <span class="k">"pairId"</span>:<span class="s">"1"</span>,
+  <span class="k">"params"</span>:{ <span class="k">"priceSource"</span>:<span class="s">"binance"</span>, <span class="k">"binanceSymbol"</span>:<span class="s">"CAKEUSDT"</span>, <span class="k">"levels"</span>:10, <span class="k">"halfSpreadBps"</span>:30, <span class="k">"rangeWidthBps"</span>:300 },
+  <span class="k">"signature"</span>:<span class="s">"0x…"</span>, <span class="k">"deadline"</span>:1731000000, <span class="k">"nonce"</span>:<span class="s">"1"</span>
+}
+
+200  → { <span class="k">"ok"</span>:true, <span class="k">"subscription"</span>:{…} }</pre>
+        <div class="ep"><div class="ep-head"><span class="m post">POST</span><span class="path">/mm/unsubscribe</span><span class="auth">EIP-712 sig</span></div><div class="ep-desc">Cancel hosted MM. Requires a signature over MMUnsubscribe. Returns <code class="inl">{ok, removed}</code>, or 404 if there is no subscription for that pair.</div></div>
+        <div class="ep"><div class="ep-head"><span class="m get">GET</span><span class="path">/mm/subscriptions?maker=0x…</span><span class="auth">x-mm-key (own address only)</span></div><div class="ep-desc">Query a maker's hosted subscriptions. Returns <code class="inl">{subscriptions:[…]}</code>.</div></div>
+      </div>
+    </section>
+
+    <section id="mm-contact">
+      <div data-lang="zh">
+        <h3>高级做市联系</h3>
+        <div class="ep"><div class="ep-head"><span class="m post">POST</span><span class="path">/mm/contact</span><span class="auth">无鉴权</span></div><div class="ep-desc">高级做市商联系表单，仅落库邮箱与需求，平台人工跟进，不涉及资金 / 签名 / 准入。</div></div>
+        <pre>POST /api/mm/contact
+{ <span class="k">"email"</span>:<span class="s">"you@example.com"</span>, <span class="k">"note"</span>:<span class="s">"…"</span>, <span class="k">"token"</span>:<span class="s">"0x…"</span> }
+
+200  → { <span class="k">"ok"</span>:true }</pre>
+      </div>
+      <div data-lang="en">
+        <h3>Advanced MM contact</h3>
+        <div class="ep"><div class="ep-head"><span class="m post">POST</span><span class="path">/mm/contact</span><span class="auth">no auth</span></div><div class="ep-desc">Advanced-maker contact form; stores an email and request for manual follow-up. No funds, signing or admission involved.</div></div>
+        <pre>POST /api/mm/contact
+{ <span class="k">"email"</span>:<span class="s">"you@example.com"</span>, <span class="k">"note"</span>:<span class="s">"…"</span>, <span class="k">"token"</span>:<span class="s">"0x…"</span> }
+
+200  → { <span class="k">"ok"</span>:true }</pre>
+      </div>
+    </section>
+
+    <section id="trade-model">
+      <div data-lang="zh">
+        <h3>交易 API 概览</h3>
+        <p>交易 API 和做市报价共用同一把 API Key，Key 代表它绑定的那个钱包。下单、撤单、查询都用这一把 Key，不需要另外申请。</p>
+        <p><b>平台不托管资金，也不替你付 gas。</b>下单类接口返回一笔算好的交易（<code class="inl">to</code> / <code class="inl">data</code> / <code class="inl">value</code>），由你的程序用 Key 绑定的钱包签名并广播，gas 由你自己付。资金始终在你自己的钱包里，成交与保护由合约强制执行。</p>
+        <table>
+          <tr><th>类型</th><th>怎么成交</th></tr>
+          <tr><td>市价单</td><td class="d">服务端按当前盘口（链上挂单 + 做市签名报价）规划路由，组装一笔聚合吃单交易，带"最少到手量"。盘口在你发交易时变差、到手会低于最少到手量的，整笔回滚，不会以意外的价格成交。</td></tr>
+          <tr><td>限价单 GTC</td><td class="d">挂到链上订单簿，挂单时锁仓（买单锁 USDT，卖单锁代币）。和对面的单价格交叉后由撮合程序自动成交，撤单时退回锁仓。只能挂不会立即成交的价格：限价已经够得着对面最优价时，接口返回 <code class="inl">WOULD_CROSS</code>，请先用 IOC 吃单，剩下的再挂。这是为了防止挂上去的单被人按你的限价、而不是盘口更好的价格成交。</td></tr>
+          <tr><td>限价单 IOC</td><td class="d">只按你的限价吃盘口上现有的单，吃不到的部分不留单。</td></tr>
+        </table>
+        <div class="ep"><div class="ep-head"><span class="path">请求头</span><span class="auth">x-api-key</span></div><div class="ep-desc">每个请求都要带 <code class="inl">x-api-key: sdx_mk_…</code>（也兼容 <code class="inl">x-mm-key</code>），而且请求 IP 必须在这把 Key 的白名单里。每把 Key 每分钟最多 600 次请求。</div></div>
+        <p>数量一律用代币最小单位的整数字符串（18 位精度的币，1 枚 = <code class="inl">1000000000000000000</code>）；价格用十进制字符串，表示 1 个基础币值多少 USDT。</p>
+        <p>出错时返回 <code class="inl">{ error, message, messageZh }</code>：<code class="inl">error</code> 是给程序判断用的固定代码，另外两个分别是英文和中文说明。</p>
+      </div>
+      <div data-lang="en">
+        <h3>Trading API overview</h3>
+        <p>The trading API uses the same API key as market-maker quoting. The key represents the wallet it is bound to, and covers placing orders, cancelling and queries. There is nothing extra to apply for.</p>
+        <p><b>The platform never holds your funds and never pays gas for you.</b> Order endpoints return a ready-made transaction (<code class="inl">to</code> / <code class="inl">data</code> / <code class="inl">value</code>). Your program signs and broadcasts it from the wallet bound to the key and pays the gas. Funds stay in your own wallet, and the contracts enforce settlement and protections.</p>
+        <table>
+          <tr><th>type</th><th>how it fills</th></tr>
+          <tr><td>Market</td><td class="d">The server plans a route across the current book (on-chain orders plus market-maker signed quotes) and builds one aggregated take transaction with a minimum amount out. If the book moves and you would receive less than that minimum, the whole transaction reverts, so you never fill at an unexpected price.</td></tr>
+          <tr><td>Limit GTC</td><td class="d">Rests on the on-chain order book with funds locked (USDT for buys, tokens for sells). It fills automatically when it crosses the other side, and cancelling returns the locked funds. GTC only accepts prices that would not trade immediately: if your limit already reaches the best price on the other side, you get <code class="inl">WOULD_CROSS</code>. Send IOC first and rest the remainder. This stops a resting order from being filled at your own limit instead of the better book price.</td></tr>
+          <tr><td>Limit IOC</td><td class="d">Takes only what is on the book at or better than your limit price. Nothing rests.</td></tr>
+        </table>
+        <div class="ep"><div class="ep-head"><span class="path">Header</span><span class="auth">x-api-key</span></div><div class="ep-desc">Every request needs <code class="inl">x-api-key: sdx_mk_…</code> (<code class="inl">x-mm-key</code> also works), and must come from an IP on that key's allowlist. Each key can make up to 600 requests per minute.</div></div>
+        <p>Quantities are integer strings in the token's smallest unit (for an 18-decimal token, 1 token = <code class="inl">1000000000000000000</code>). Prices are decimal strings: how many USDT one base token is worth.</p>
+        <p>Errors return <code class="inl">{ error, message, messageZh }</code>: <code class="inl">error</code> is a stable code for your program, the other two are explanations in English and Chinese.</p>
+      </div>
+    </section>
+
+    <section id="trade-order">
+      <div data-lang="zh">
+        <h3>下单</h3>
+        <div class="ep"><div class="ep-head"><span class="m post">POST</span><span class="path">/v1/trade/order</span><span class="auth">x-api-key</span></div><div class="ep-desc">返回待签名的交易。余额不够或授权不足时如实告诉你，并附上需要先发的授权交易。</div></div>
+        <table>
+          <tr><th>字段</th><th>说明</th></tr>
+          <tr><td>pairId</td><td class="d">交易对编号，见 <a href="#pairs">GET /pairs</a></td></tr>
+          <tr><td>side</td><td class="d"><code class="inl">buy</code> 或 <code class="inl">sell</code></td></tr>
+          <tr><td>type</td><td class="d"><code class="inl">market</code>（默认）或 <code class="inl">limit</code></td></tr>
+          <tr><td>qty</td><td class="d">基础币数量，最小单位整数字符串</td></tr>
+          <tr><td>price</td><td class="d">限价单必填，必须落在交易对的最小价格变动上；不在的话会返回 <code class="inl">PRICE_NOT_ON_TICK</code> 和建议价</td></tr>
+          <tr><td>timeInForce</td><td class="d">限价单用：<code class="inl">GTC</code>（默认，挂单）或 <code class="inl">IOC</code>（只吃不挂）</td></tr>
+          <tr><td>slippageBps</td><td class="d">市价单允许的滑点，默认 100（1%），最多 1000</td></tr>
+          <tr><td>allowPartial</td><td class="d">市价单深度不够时是否按现有深度成交，默认 true；传 false 则深度不够直接报错</td></tr>
+          <tr><td>expiry</td><td class="d">GTC 挂单的到期时间（Unix 秒），0 表示不过期</td></tr>
+          <tr><td>deadlineSec</td><td class="d">吃单交易的有效期，30 到 600 秒，默认 120；超时上链会回滚</td></tr>
+        </table>
+        <pre>POST /api/v1/trade/order
+x-api-key: sdx_mk_…
+{ <span class="k">"pairId"</span>:<span class="s">"2"</span>, <span class="k">"side"</span>:<span class="s">"sell"</span>, <span class="k">"type"</span>:<span class="s">"market"</span>, <span class="k">"qty"</span>:<span class="s">"100000000"</span>, <span class="k">"slippageBps"</span>:100 }
+
+200 → {
+  <span class="k">"plan"</span>: { <span class="k">"fillQty"</span>:<span class="s">"100000000"</span>, <span class="k">"avgPrice"</span>:0.059566, <span class="k">"expectedOut"</span>:<span class="s">"59387302000000000"</span>, <span class="k">"minOut"</span>:<span class="s">"58793428980000000"</span>, <span class="k">"legs"</span>:[…] },
+  <span class="k">"pay"</span>: { <span class="k">"token"</span>:<span class="s">"0x…"</span>, <span class="k">"max"</span>:<span class="s">"100000000"</span> },
+  <span class="k">"balanceEnough"</span>: true,
+  <span class="k">"approvals"</span>: [ { <span class="k">"spender"</span>:<span class="s">"0x…"</span>, <span class="k">"amount"</span>:<span class="s">"…"</span>, <span class="k">"tx"</span>:{ <span class="k">"to"</span>:<span class="s">"0x…"</span>, <span class="k">"data"</span>:<span class="s">"0x095ea7b3…"</span> } } ],
+  <span class="k">"tx"</span>: { <span class="k">"to"</span>:<span class="s">"0x…"</span>, <span class="k">"data"</span>:<span class="s">"0x…"</span>, <span class="k">"value"</span>:<span class="s">"0"</span>, <span class="k">"chainId"</span>:56, <span class="k">"gas"</span>:<span class="s">"360485"</span> },
+  <span class="k">"deadline"</span>: <span class="s">"1763340000"</span>, <span class="k">"simulated"</span>: true
+}</pre>
+        <div class="note">使用步骤：① <code class="inl">approvals</code> 不为空时，先逐笔发出这些授权交易；② 授权上链后<b>重新请求一次</b>，拿到最新的计划；③ 在 <code class="inl">deadline</code> 之前签名广播 <code class="inl">tx</code>。<code class="inl">simulated=true</code> 表示服务端已经用你的地址模拟过这笔交易，能成交。</div>
+      </div>
+      <div data-lang="en">
+        <h3>Place an order</h3>
+        <div class="ep"><div class="ep-head"><span class="m post">POST</span><span class="path">/v1/trade/order</span><span class="auth">x-api-key</span></div><div class="ep-desc">Returns a transaction for you to sign. If your balance or allowance is short, the response says so and includes the approval transactions to send first.</div></div>
+        <table>
+          <tr><th>field</th><th>meaning</th></tr>
+          <tr><td>pairId</td><td class="d">pair id, see <a href="#pairs">GET /pairs</a></td></tr>
+          <tr><td>side</td><td class="d"><code class="inl">buy</code> or <code class="inl">sell</code></td></tr>
+          <tr><td>type</td><td class="d"><code class="inl">market</code> (default) or <code class="inl">limit</code></td></tr>
+          <tr><td>qty</td><td class="d">base amount, integer string in the smallest unit</td></tr>
+          <tr><td>price</td><td class="d">required for limit orders and must sit on the pair's tick; otherwise you get <code class="inl">PRICE_NOT_ON_TICK</code> with a suggested price</td></tr>
+          <tr><td>timeInForce</td><td class="d">for limit orders: <code class="inl">GTC</code> (default, rests on the book) or <code class="inl">IOC</code> (take only)</td></tr>
+          <tr><td>slippageBps</td><td class="d">market order slippage tolerance, default 100 (1%), max 1000</td></tr>
+          <tr><td>allowPartial</td><td class="d">for market orders, whether to trade what is available when the book is thin; default true, send false to get an error instead</td></tr>
+          <tr><td>expiry</td><td class="d">GTC order expiry as a unix timestamp in seconds; 0 means never</td></tr>
+          <tr><td>deadlineSec</td><td class="d">validity of a take transaction, 30 to 600 seconds, default 120; it reverts if mined later</td></tr>
+        </table>
+        <pre>POST /api/v1/trade/order
+x-api-key: sdx_mk_…
+{ <span class="k">"pairId"</span>:<span class="s">"2"</span>, <span class="k">"side"</span>:<span class="s">"sell"</span>, <span class="k">"type"</span>:<span class="s">"market"</span>, <span class="k">"qty"</span>:<span class="s">"100000000"</span>, <span class="k">"slippageBps"</span>:100 }
+
+200 → {
+  <span class="k">"plan"</span>: { <span class="k">"fillQty"</span>:<span class="s">"100000000"</span>, <span class="k">"avgPrice"</span>:0.059566, <span class="k">"expectedOut"</span>:<span class="s">"59387302000000000"</span>, <span class="k">"minOut"</span>:<span class="s">"58793428980000000"</span>, <span class="k">"legs"</span>:[…] },
+  <span class="k">"pay"</span>: { <span class="k">"token"</span>:<span class="s">"0x…"</span>, <span class="k">"max"</span>:<span class="s">"100000000"</span> },
+  <span class="k">"balanceEnough"</span>: true,
+  <span class="k">"approvals"</span>: [ { <span class="k">"spender"</span>:<span class="s">"0x…"</span>, <span class="k">"amount"</span>:<span class="s">"…"</span>, <span class="k">"tx"</span>:{ <span class="k">"to"</span>:<span class="s">"0x…"</span>, <span class="k">"data"</span>:<span class="s">"0x095ea7b3…"</span> } } ],
+  <span class="k">"tx"</span>: { <span class="k">"to"</span>:<span class="s">"0x…"</span>, <span class="k">"data"</span>:<span class="s">"0x…"</span>, <span class="k">"value"</span>:<span class="s">"0"</span>, <span class="k">"chainId"</span>:56, <span class="k">"gas"</span>:<span class="s">"360485"</span> },
+  <span class="k">"deadline"</span>: <span class="s">"1763340000"</span>, <span class="k">"simulated"</span>: true
+}</pre>
+        <div class="note">How to use it: (1) if <code class="inl">approvals</code> is not empty, send those approval transactions first; (2) once they are mined, <b>request the order again</b> to get a fresh plan; (3) sign and broadcast <code class="inl">tx</code> before <code class="inl">deadline</code>. <code class="inl">simulated=true</code> means the server has already simulated the transaction from your address and it fills.</div>
+      </div>
+    </section>
+
+    <section id="trade-cancel">
+      <div data-lang="zh">
+        <h3>撤单</h3>
+        <div class="ep"><div class="ep-head"><span class="m post">POST</span><span class="path">/v1/trade/cancel</span><span class="auth">x-api-key</span></div><div class="ep-desc">传 <code class="inl">orderId</code>，或者 <code class="inl">orderIds</code>（1 到 50 个）。每张单返回一笔撤单交易，由你的钱包签名发送，锁仓退回钱包。只能撤自己的挂单。</div></div>
+        <pre>POST /api/v1/trade/cancel
+{ <span class="k">"orderIds"</span>:[<span class="s">"12"</span>,<span class="s">"15"</span>] }
+
+200 → { <span class="k">"txs"</span>:[ { <span class="k">"orderId"</span>:<span class="s">"12"</span>, <span class="k">"tx"</span>:{ <span class="k">"to"</span>:<span class="s">"0x…"</span>, <span class="k">"data"</span>:<span class="s">"0x…"</span> } }, … ] }</pre>
+        <div class="note">做市签名报价的撤销走 <a href="#quote">/quote/cancel</a>，不在这里。</div>
+      </div>
+      <div data-lang="en">
+        <h3>Cancel</h3>
+        <div class="ep"><div class="ep-head"><span class="m post">POST</span><span class="path">/v1/trade/cancel</span><span class="auth">x-api-key</span></div><div class="ep-desc">Send <code class="inl">orderId</code>, or <code class="inl">orderIds</code> (1 to 50). You get one cancel transaction per order to sign from your wallet; locked funds return to the wallet. You can only cancel your own orders.</div></div>
+        <pre>POST /api/v1/trade/cancel
+{ <span class="k">"orderIds"</span>:[<span class="s">"12"</span>,<span class="s">"15"</span>] }
+
+200 → { <span class="k">"txs"</span>:[ { <span class="k">"orderId"</span>:<span class="s">"12"</span>, <span class="k">"tx"</span>:{ <span class="k">"to"</span>:<span class="s">"0x…"</span>, <span class="k">"data"</span>:<span class="s">"0x…"</span> } }, … ] }</pre>
+        <div class="note">Signed market-maker quotes are cancelled through <a href="#quote">/quote/cancel</a>, not here.</div>
+      </div>
+    </section>
+
+    <section id="trade-query">
+      <div data-lang="zh">
+        <h3>查询</h3>
+        <div class="ep"><div class="ep-head"><span class="m get">GET</span><span class="path">/v1/trade/orders?pairId=&amp;status=open&amp;limit=100</span><span class="auth">x-api-key</span></div><div class="ep-desc">你的链上挂单。<code class="inl">status</code> 可选 <code class="inl">open</code>（默认）、<code class="inl">filled</code>、<code class="inl">cancelled</code>、<code class="inl">expired</code>、<code class="inl">all</code>。</div></div>
+        <div class="ep"><div class="ep-head"><span class="m get">GET</span><span class="path">/v1/trade/fills?pairId=&amp;limit=100</span><span class="auth">x-api-key</span></div><div class="ep-desc">你的成交记录，最新的在前，包括吃单、挂单被吃和做市金库成交。</div></div>
+        <div class="ep"><div class="ep-head"><span class="m get">GET</span><span class="path">/v1/trade/balances</span><span class="auth">x-api-key</span></div><div class="ep-desc">钱包里各交易对用到的代币余额、对订单簿和签名结算合约的授权额度，以及卖单里锁着的数量。</div></div>
+        <div class="ep"><div class="ep-head"><span class="m get">GET</span><span class="path">/v1/trade/tx/:hash</span><span class="auth">x-api-key</span></div><div class="ep-desc">查一笔交易的结果：<code class="inl">pending</code>、<code class="inl">success</code> 或 <code class="inl">reverted</code>，以及已经索引到的成交明细。</div></div>
+      </div>
+      <div data-lang="en">
+        <h3>Queries</h3>
+        <div class="ep"><div class="ep-head"><span class="m get">GET</span><span class="path">/v1/trade/orders?pairId=&amp;status=open&amp;limit=100</span><span class="auth">x-api-key</span></div><div class="ep-desc">Your on-chain orders. <code class="inl">status</code> can be <code class="inl">open</code> (default), <code class="inl">filled</code>, <code class="inl">cancelled</code>, <code class="inl">expired</code> or <code class="inl">all</code>.</div></div>
+        <div class="ep"><div class="ep-head"><span class="m get">GET</span><span class="path">/v1/trade/fills?pairId=&amp;limit=100</span><span class="auth">x-api-key</span></div><div class="ep-desc">Your fills, newest first: takes, your resting orders being filled, and market-maker vault fills.</div></div>
+        <div class="ep"><div class="ep-head"><span class="m get">GET</span><span class="path">/v1/trade/balances</span><span class="auth">x-api-key</span></div><div class="ep-desc">Wallet balances of every token used by a pair, allowances to the order book and the signed-quote settler, and the amount locked in your sell orders.</div></div>
+        <div class="ep"><div class="ep-head"><span class="m get">GET</span><span class="path">/v1/trade/tx/:hash</span><span class="auth">x-api-key</span></div><div class="ep-desc">Result of a transaction: <code class="inl">pending</code>, <code class="inl">success</code> or <code class="inl">reverted</code>, plus any fills already indexed.</div></div>
+      </div>
+    </section>
+
+    <section id="eip712">
+      <div data-lang="zh">
+        <h2>EIP-712 域与结构</h2>
+        <p>做市相关签名共用主网参数 <code class="inl">chainId: 56</code>、<code class="inl">verifyingContract: SignedQuoteSettler</code>。三套域：</p>
+        <h3>SignedQuote（报价单）</h3>
+        <pre>domain = {
+  <span class="k">name</span>:<span class="s">"SorDexSignedQuote"</span>, <span class="k">version</span>:<span class="s">"1"</span>,
+  <span class="k">chainId</span>:56, <span class="k">verifyingContract</span>:<span class="s">"0xD5D43Ea31dEaFaeD32127516A1a2c381a0ef2f1d"</span>  <span class="c">// Settler</span>
+}
+
+SignedQuote {
+  <span class="p">address</span> maker;    <span class="c">// 做市商地址</span>
+  <span class="p">uint256</span> pairId;
+  <span class="p">uint8</span>   side;     <span class="c">// 0=买(bid)  1=卖(ask)</span>
+  <span class="p">uint256</span> priceNum; <span class="c">// 价格 = priceNum / priceDen（最小单位比）</span>
+  <span class="p">uint256</span> priceDen;
+  <span class="p">uint256</span> baseQty;  <span class="c">// base 数量（最小单位）</span>
+  <span class="p">uint64</span>  expiry;   <span class="c">// 到期时间戳（秒）。必填，不能为 0，且不能超过当前时间 + 840 秒（14 分钟）；到期自然失效</span>
+  <span class="p">uint256</span> nonce;    <span class="c">// 须 &gt;= minValidNonce(maker)</span>
+  <span class="p">uint256</span> salt;     <span class="c">// 每档唯一，去重</span>
+}</pre>
+        <div class="note">成交额（quote 最小单位）= baseQty × priceNum / priceDen。quoteHash 可由 <code class="inl">SignedQuoteSettler.hashQuote(quote)</code> 读到，或取 <code class="inl">POST /quote</code> 返回的 <code class="inl">hash</code>。</div>
+        <h3>MMAccess（Key 申领 / 改白名单）</h3>
+        <pre>domain = { <span class="k">name</span>:<span class="s">"SorDexMMAccess"</span>, <span class="k">version</span>:<span class="s">"1"</span>, <span class="k">chainId</span>:56, <span class="k">verifyingContract</span>:Settler }
+
+MMAccess {
+  <span class="p">address</span> maker;
+  <span class="p">string</span>  action;   <span class="c">// "issue" 申领/轮换  |  "update-ip" 改白名单</span>
+  <span class="p">string</span>  ips;      <span class="c">// IP 白名单，按分号 ; 连接（签名覆盖，防篡改）</span>
+  <span class="p">uint256</span> deadline; <span class="c">// 秒</span>
+  <span class="p">uint256</span> nonce;
+}</pre>
+        <h3>MMSubscribe / MMUnsubscribe（托管做市）</h3>
+        <pre>domain = { <span class="k">name</span>:<span class="s">"SorDexHostedMM"</span>, <span class="k">version</span>:<span class="s">"1"</span>, <span class="k">chainId</span>:56, <span class="k">verifyingContract</span>:Settler }
+
+MMSubscribe {
+  <span class="p">address</span> maker; <span class="p">uint256</span> pairId;
+  <span class="p">string</span>  priceSource; <span class="p">uint256</span> fixedPriceE8;  <span class="c">// fixedPriceE8 = round(fixedPrice × 1e8)</span>
+  <span class="p">string</span>  binanceSymbol; <span class="p">uint256</span> levels;
+  <span class="p">uint256</span> halfSpreadBps; <span class="p">uint256</span> rangeWidthBps;
+  <span class="p">uint256</span> deadline; <span class="p">uint256</span> nonce;
+}
+MMUnsubscribe { <span class="p">address</span> maker; <span class="p">uint256</span> pairId; <span class="p">uint256</span> deadline; <span class="p">uint256</span> nonce; }</pre>
+      </div>
+      <div data-lang="en">
+        <h2>EIP-712 domains &amp; types</h2>
+        <p>Market-making signatures share the mainnet parameters <code class="inl">chainId: 56</code> and <code class="inl">verifyingContract: SignedQuoteSettler</code>. Three domains:</p>
+        <h3>SignedQuote</h3>
+        <pre>domain = {
+  <span class="k">name</span>:<span class="s">"SorDexSignedQuote"</span>, <span class="k">version</span>:<span class="s">"1"</span>,
+  <span class="k">chainId</span>:56, <span class="k">verifyingContract</span>:<span class="s">"0xD5D43Ea31dEaFaeD32127516A1a2c381a0ef2f1d"</span>  <span class="c">// Settler</span>
+}
+
+SignedQuote {
+  <span class="p">address</span> maker;    <span class="c">// maker address</span>
+  <span class="p">uint256</span> pairId;
+  <span class="p">uint8</span>   side;     <span class="c">// 0=buy(bid)  1=sell(ask)</span>
+  <span class="p">uint256</span> priceNum; <span class="c">// price = priceNum / priceDen (ratio in smallest units)</span>
+  <span class="p">uint256</span> priceDen;
+  <span class="p">uint256</span> baseQty;  <span class="c">// base amount (smallest units)</span>
+  <span class="p">uint64</span>  expiry;   <span class="c">// expiry, unix sec. Required: must not be 0 and at most now + 840 s (14 min); self-expires</span>
+  <span class="p">uint256</span> nonce;    <span class="c">// must be &gt;= minValidNonce(maker)</span>
+  <span class="p">uint256</span> salt;     <span class="c">// unique per level, for dedup</span>
+}</pre>
+        <div class="note">Notional (quote smallest units) = baseQty × priceNum / priceDen. The quoteHash comes from <code class="inl">SignedQuoteSettler.hashQuote(quote)</code> or the <code class="inl">hash</code> field returned by <code class="inl">POST /quote</code>.</div>
+        <h3>MMAccess (key issuance / IP update)</h3>
+        <pre>domain = { <span class="k">name</span>:<span class="s">"SorDexMMAccess"</span>, <span class="k">version</span>:<span class="s">"1"</span>, <span class="k">chainId</span>:56, <span class="k">verifyingContract</span>:Settler }
+
+MMAccess {
+  <span class="p">address</span> maker;
+  <span class="p">string</span>  action;   <span class="c">// "issue" = issue/rotate  |  "update-ip" = update allowlist</span>
+  <span class="p">string</span>  ips;      <span class="c">// IP allowlist joined by ";" (covered by the signature)</span>
+  <span class="p">uint256</span> deadline; <span class="c">// seconds</span>
+  <span class="p">uint256</span> nonce;
+}</pre>
+        <h3>MMSubscribe / MMUnsubscribe (hosted MM)</h3>
+        <pre>domain = { <span class="k">name</span>:<span class="s">"SorDexHostedMM"</span>, <span class="k">version</span>:<span class="s">"1"</span>, <span class="k">chainId</span>:56, <span class="k">verifyingContract</span>:Settler }
+
+MMSubscribe {
+  <span class="p">address</span> maker; <span class="p">uint256</span> pairId;
+  <span class="p">string</span>  priceSource; <span class="p">uint256</span> fixedPriceE8;  <span class="c">// fixedPriceE8 = round(fixedPrice × 1e8)</span>
+  <span class="p">string</span>  binanceSymbol; <span class="p">uint256</span> levels;
+  <span class="p">uint256</span> halfSpreadBps; <span class="p">uint256</span> rangeWidthBps;
+  <span class="p">uint256</span> deadline; <span class="p">uint256</span> nonce;
+}
+MMUnsubscribe { <span class="p">address</span> maker; <span class="p">uint256</span> pairId; <span class="p">uint256</span> deadline; <span class="p">uint256</span> nonce; }</pre>
+      </div>
+    </section>
+
+    <section id="quote">
+      <div data-lang="zh">
+        <h2>提交签名报价</h2>
+        <div class="ep"><div class="ep-head"><span class="m post">POST</span><span class="path">/quote</span><span class="auth">准入 + x-mm-key</span></div><div class="ep-desc">提交一条签名报价，验签通过入池。签名须为规范 65 字节（低 s 值），否则拒收。重复提交同一条报价是幂等的：返回同一个 hash（HTTP 200），不会重复入池，也不会返回 409。入池前会同步校验：交易对存在、价格在 tick 上、数量与成交额不低于最小值、nonce 未被作废，不合格直接返回 400 和具体错误码。</div></div>
+        <pre>POST /api/quote
+x-mm-key: sdx_mk_…
+{ <span class="k">"quote"</span>:{ …SignedQuote 字段… }, <span class="k">"signature"</span>:<span class="s">"0x…"</span> }
+
+200  → { <span class="k">"ok"</span>:true, <span class="k">"hash"</span>:<span class="s">"0x…(quoteHash)"</span> }
+4xx  → { <span class="k">"error"</span>:<span class="s">"…"</span>, <span class="k">"code"</span>:<span class="s">"…"</span> }</pre>
+        <div class="note">签名被拒时 <code class="inl">code</code> 说明原因：<code class="inl">SIG_MALFORMED</code> 不是 0x+130 位十六进制；<code class="inl">SIG_NON_CANONICAL</code> s 值不在低半区或 v 不是 27/28；<code class="inl">SIG_UNRECOVERABLE</code> 无法从签名恢复出地址；<code class="inl">SIGNER_NOT_AUTHORIZED</code> 恢复出的地址既不是 maker 也不是其已授权代理——多半是签名域（chainId、verifyingContract=当前 Settler）或某个报价字段与提交内容不一致，错误信息里会给出恢复出的地址和本服务使用的签名域。</div>
+        <div class="ep"><div class="ep-head"><span class="m post">POST</span><span class="path">/quote/batch</span><span class="auth">准入 + x-mm-key</span></div><div class="ep-desc">批量提交（1~64 条，一梯一次送）。逐条返回结果，单条失败不影响其余。</div></div>
+        <pre>POST /api/quote/batch
+x-mm-key: sdx_mk_…
+{ <span class="k">"quotes"</span>:[ { <span class="k">"quote"</span>:{…}, <span class="k">"signature"</span>:<span class="s">"0x…"</span> }, … ] }
+
+200  → { <span class="k">"ok"</span>:true, <span class="k">"results"</span>:[ {<span class="k">"ok"</span>:true,<span class="k">"hash"</span>:<span class="s">"0x…"</span>} | {<span class="k">"ok"</span>:false,<span class="k">"error"</span>:<span class="s">"…"</span>,<span class="k">"code"</span>:<span class="s">"…"</span>}, … ] }</pre>
+        <div class="ep"><div class="ep-head"><span class="m post">POST</span><span class="path">/quote/cancel</span><span class="auth">MMAccess 签名</span></div><div class="ep-desc">撤掉自己在报价池里的签名单（按 quoteHash 或全部），盘口立即不再展示、吃单方不会再选中。由 maker 本人或其已授权代理签 <code class="inl">SorDexMMAccess</code>：<code class="inl">action</code>="cancel-quotes"，<code class="inl">ips</code> 字段填 "all"，或把要撤的 quoteHash（小写）按提交顺序用 ";" 连接。每个签名只能用一次。</div></div>
+        <pre>POST /api/quote/cancel
+{ <span class="k">"maker"</span>:<span class="s">"0x…"</span>, <span class="k">"all"</span>:true,               <span class="c">// 或 "hashes":["0x…", …]（1~100 个）</span>
+  <span class="k">"signature"</span>:<span class="s">"0x…"</span>, <span class="k">"deadline"</span>:1794600000, <span class="k">"nonce"</span>:<span class="s">"1"</span> }
+
+200  → { <span class="k">"ok"</span>:true, <span class="k">"removed"</span>:3 }</pre>
+        <div class="note">这是链下撤单：已签出的报价在 expiry 前链上仍然有效，若签名已被别人拿到仍可能成交。需要确定性作废时，用链上 <code class="inl">cancelQuote</code> / <code class="inl">cancelQuoteUpTo</code>（见 <a href="#onchain">核心合约函数</a>）。日常改价建议签短 expiry + 重签新价。</div>
+      </div>
+      <div data-lang="en">
+        <h2>Submit signed quotes</h2>
+        <div class="ep"><div class="ep-head"><span class="m post">POST</span><span class="path">/quote</span><span class="auth">admission + x-mm-key</span></div><div class="ep-desc">Submit one signed quote; enters the pool once verified. The signature must be a canonical 65-byte (low-s) value or it is rejected. Submitting the same quote again is idempotent: you get the same hash back (HTTP 200) and it is not added twice, and no 409 is returned. Before entering the pool the quote is checked synchronously: the pair must exist, the price must be on the tick, size and notional must meet the minimums, and the nonce must not be invalidated; otherwise you get a 400 with a specific error code.</div></div>
+        <pre>POST /api/quote
+x-mm-key: sdx_mk_…
+{ <span class="k">"quote"</span>:{ …SignedQuote fields… }, <span class="k">"signature"</span>:<span class="s">"0x…"</span> }
+
+200  → { <span class="k">"ok"</span>:true, <span class="k">"hash"</span>:<span class="s">"0x…(quoteHash)"</span> }
+4xx  → { <span class="k">"error"</span>:<span class="s">"…"</span>, <span class="k">"code"</span>:<span class="s">"…"</span> }</pre>
+        <div class="note">When a signature is rejected, <code class="inl">code</code> tells you why: <code class="inl">SIG_MALFORMED</code> is not 0x + 130 hex chars; <code class="inl">SIG_NON_CANONICAL</code> has a high s value or a v other than 27/28; <code class="inl">SIG_UNRECOVERABLE</code> no address can be recovered; <code class="inl">SIGNER_NOT_AUTHORIZED</code> the recovered address is neither the maker nor one of its authorized agents. That last one usually means the signing domain (chainId, verifyingContract = the current Settler) or a quote field differs from what you submitted; the error message includes the recovered address and the domain this service uses.</div>
+        <div class="ep"><div class="ep-head"><span class="m post">POST</span><span class="path">/quote/batch</span><span class="auth">admission + x-mm-key</span></div><div class="ep-desc">Batch submit (1–64 items, a full ladder in one call). Per-item results; a single failure does not block the rest.</div></div>
+        <pre>POST /api/quote/batch
+x-mm-key: sdx_mk_…
+{ <span class="k">"quotes"</span>:[ { <span class="k">"quote"</span>:{…}, <span class="k">"signature"</span>:<span class="s">"0x…"</span> }, … ] }
+
+200  → { <span class="k">"ok"</span>:true, <span class="k">"results"</span>:[ {<span class="k">"ok"</span>:true,<span class="k">"hash"</span>:<span class="s">"0x…"</span>} | {<span class="k">"ok"</span>:false,<span class="k">"error"</span>:<span class="s">"…"</span>,<span class="k">"code"</span>:<span class="s">"…"</span>}, … ] }</pre>
+        <div class="ep"><div class="ep-head"><span class="m post">POST</span><span class="path">/quote/cancel</span><span class="auth">MMAccess signature</span></div><div class="ep-desc">Pull your own signed quotes from the quote pool, by quoteHash or all at once. They disappear from the book right away and takers will no longer route to them. Signed by the maker or one of its authorized agents with <code class="inl">SorDexMMAccess</code>: <code class="inl">action</code> = "cancel-quotes", and <code class="inl">ips</code> = "all", or the quoteHashes (lowercase) joined by ";" in the order you send them. Each signature can be used once.</div></div>
+        <pre>POST /api/quote/cancel
+{ <span class="k">"maker"</span>:<span class="s">"0x…"</span>, <span class="k">"all"</span>:true,               <span class="c">// or "hashes":["0x…", …] (1–100)</span>
+  <span class="k">"signature"</span>:<span class="s">"0x…"</span>, <span class="k">"deadline"</span>:1794600000, <span class="k">"nonce"</span>:<span class="s">"1"</span> }
+
+200  → { <span class="k">"ok"</span>:true, <span class="k">"removed"</span>:3 }</pre>
+        <div class="note">This is an off-chain cancel: a signed quote stays valid on chain until its expiry, so anyone who already holds the signature could still fill it. For a guaranteed cancel, call <code class="inl">cancelQuote</code> / <code class="inl">cancelQuoteUpTo</code> on chain (see <a href="#onchain">core calls</a>). For routine repricing, sign short expiries and re-sign at the new price.</div>
+      </div>
+    </section>
+
+    <section id="signed-quotes">
+      <div data-lang="zh">
+        <h3>查询签名盘口</h3>
+        <div class="ep"><div class="ep-head"><span class="m get">GET</span><span class="path">/signed-quotes?pairId=1</span><span class="auth">无鉴权</span></div><div class="ep-desc">当前池中有效的签名报价（B 单）明细，供智能路由吃单选单。与 <code class="inl">/mixed-book</code> 合并即用户看到的完整盘口。</div></div>
+        <pre>200  → {
+  <span class="k">"pairId"</span>:<span class="s">"1"</span>,
+  <span class="k">"quotes"</span>:[ { <span class="k">"quote"</span>:{…}, <span class="k">"signature"</span>:<span class="s">"0x…"</span>, <span class="k">"availableBase"</span>:<span class="s">"…"</span>, <span class="k">"price"</span>:0.25, <span class="k">"side"</span>:1 }, … ]
+}</pre>
+      </div>
+      <div data-lang="en">
+        <h3>Signed book</h3>
+        <div class="ep"><div class="ep-head"><span class="m get">GET</span><span class="path">/signed-quotes?pairId=1</span><span class="auth">no auth</span></div><div class="ep-desc">Valid signed quotes (B-orders) currently in the pool, for taker smart routing. Merged with <code class="inl">/mixed-book</code> for the full book users see.</div></div>
+        <pre>200  → {
+  <span class="k">"pairId"</span>:<span class="s">"1"</span>,
+  <span class="k">"quotes"</span>:[ { <span class="k">"quote"</span>:{…}, <span class="k">"signature"</span>:<span class="s">"0x…"</span>, <span class="k">"availableBase"</span>:<span class="s">"…"</span>, <span class="k">"price"</span>:0.25, <span class="k">"side"</span>:1 }, … ]
+}</pre>
+      </div>
+    </section>
+
+    <section id="admission">
+      <div data-lang="zh">
+        <h2>报价准入</h2>
+        <p><code class="inl">/quote</code> 与 <code class="inl">/quote/batch</code> 按以下顺序放行（<code class="inl">quote.maker</code> 为准入主体）：</p>
+        <ul>
+          <li><b>已被平台停用的地址</b>：一律拒收，返回 403。</li>
+          <li><b>金库做市</b>：maker 为 VAULT 模式且在该交易对金库有可用余额 → 直接放行，无需 Key。</li>
+          <li><b>其余情况</b>：请求头须带有效 <code class="inl">x-mm-key</code>，且满足：Key 处于 active、Key 绑定地址 == quote.maker、请求来源 IP 在该 Key 的白名单内。</li>
+        </ul>
+        <p>读链失败或取不到金库余额时保守落到 Key 校验（fail-closed）。违反任一条返回 401/403，错误文案指明原因。</p>
+        <p>通过准入后，入池还有两条资金规则（防止用尘埃报价占满报价池）：</p>
+        <ul>
+          <li><b>单张最小额</b>：每张报价的成交额（数量 × 价格）至少 <b>0.5 USDT</b>，低于此返回 <code class="inl">BELOW_POOL_MIN_NOTIONAL</code>。链上最小额更低，但报价池按这个门槛收。</li>
+          <li><b>资金覆盖</b>：同一 maker、同一交易对、同一方向，池内报价加上本张的总量不得超过可用资金（卖单看 base，买单看 USDT；VAULT 模式为金库可用额，ALLOWANCE 模式为授权额与钱包余额的较小值）。超出返回 <code class="inl">NOT_COVERED</code>；暂时读不到资金返回 <code class="inl">BUDGET_UNKNOWN</code>，稍后重试即可。超出资金的报价本来也进不了盘口，所以先撤掉一些再补。</li>
+        </ul>
+        <p><code class="inl">pairId</code> 及各数值字段会统一成十进制字符串（例如 <code class="inl">"01"</code> 与数字 <code class="inl">1</code> 都按 <code class="inl">"1"</code> 处理），签名与 hash 不受影响。</p>
+      </div>
+      <div data-lang="en">
+        <h2>Quote admission</h2>
+        <p><code class="inl">/quote</code> and <code class="inl">/quote/batch</code> admit in this order (the subject is <code class="inl">quote.maker</code>):</p>
+        <ul>
+          <li><b>Addresses suspended by the platform</b> are always rejected with 403.</li>
+          <li><b>Vault custody</b>: a VAULT-mode maker with available balance in the pair's vault is admitted directly, no key needed.</li>
+          <li><b>Otherwise</b>: the request must carry a valid <code class="inl">x-mm-key</code> that is active, whose bound address equals quote.maker, and the request's source IP must be in that key's allowlist.</li>
+        </ul>
+        <p>If chain reads or vault-balance lookups fail, admission falls back to the key check (fail-closed). Any violation returns 401/403 with an error message stating the cause.</p>
+        <p>Once admitted, two funding rules apply before a quote enters the pool (so the pool can't be filled with dust):</p>
+        <ul>
+          <li><b>Minimum size</b>: each quote must be worth at least <b>0.5 USDT</b> (size × price), otherwise you get <code class="inl">BELOW_POOL_MIN_NOTIONAL</code>. The on-chain minimum is lower, but the pool applies this floor.</li>
+          <li><b>Funds must cover the quotes</b>: for the same maker, pair and side, the quotes already in the pool plus this one may not exceed the available funds (base for asks, USDT for bids; the vault balance in VAULT mode, or the lower of allowance and wallet balance in ALLOWANCE mode). Going over returns <code class="inl">NOT_COVERED</code>; if funds can't be read right now you get <code class="inl">BUDGET_UNKNOWN</code> and can simply retry. Quotes beyond your funds would never show on the book anyway, so cancel some before adding more.</li>
+        </ul>
+        <p><code class="inl">pairId</code> and the numeric fields are normalized to decimal strings (for example <code class="inl">"01"</code> and the number <code class="inl">1</code> are both treated as <code class="inl">"1"</code>); signatures and hashes are unaffected.</p>
+      </div>
+    </section>
+
+    <section id="agent">
+      <div data-lang="zh">
+        <h2>代理自动挂单</h2>
+        <p>持续自动挂单时，无法每档都用钱包弹窗签名。做市商可一次性授权一个代理地址，由本地进程用代理私钥自动签报价——代理只能签报价，碰不到提现。</p>
+        <ul>
+          <li><b>1. 存保证金</b>：<code class="inl">MMCollateralVault.deposit(token, amount)</code>，资金锁在金库、只由你自己提。</li>
+          <li><b>2. 一次性授权</b>：本地生成代理地址，用做市商钱包对 Settler 调 <code class="inl">setAgent(agent, expiry)</code>（expiry 为授权到期秒级时间戳，传 0 撤销）。</li>
+          <li><b>3. 本地自动签</b>：进程用代理私钥 EIP-712 签每档、提交 <code class="inl">/quote</code> 或 <code class="inl">/quote/batch</code>。报价 <code class="inl">maker</code> 仍填做市商地址；后端识别签名人为已授权代理即放行。</li>
+        </ul>
+        <pre><span class="c">// 一次性授权（做市商钱包发起）</span>
+SignedQuoteSettler.setAgent(agentAddress, expiryUnixSeconds)
+<span class="c">// 查询授权</span>
+SignedQuoteSettler.isAuthorizedAgent(maker, agent) -&gt; bool</pre>
+        <div class="note purple">代理私钥泄露最坏情况仅限「在金库额度与价格范围内乱签报价」，不能提现；授权带 expiry 自动到期，可随时 <code class="inl">setAgent(agent, 0)</code> 撤销。</div>
+      </div>
+      <div data-lang="en">
+        <h2>Agent quoting</h2>
+        <p>Continuous quoting cannot pop a wallet prompt per level. A maker authorizes an agent address once, then a local process signs quotes with the agent key automatically — the agent can only sign quotes, never withdraw.</p>
+        <ul>
+          <li><b>1. Fund the vault</b>: <code class="inl">MMCollateralVault.deposit(token, amount)</code>; funds stay locked and only you withdraw.</li>
+          <li><b>2. Authorize once</b>: generate an agent address locally and call <code class="inl">setAgent(agent, expiry)</code> on the Settler from the maker wallet (expiry = unix seconds; 0 revokes).</li>
+          <li><b>3. Auto-sign locally</b>: the process EIP-712-signs each level with the agent key and posts to <code class="inl">/quote</code> or <code class="inl">/quote/batch</code>. The quote's <code class="inl">maker</code> stays the maker address; the backend admits once it sees the signer is an authorized agent.</li>
+        </ul>
+        <pre><span class="c">// one-time authorization (from the maker wallet)</span>
+SignedQuoteSettler.setAgent(agentAddress, expiryUnixSeconds)
+<span class="c">// check authorization</span>
+SignedQuoteSettler.isAuthorizedAgent(maker, agent) -&gt; bool</pre>
+        <div class="note purple">Worst case if the agent key leaks is bounded to signing bad quotes within your vault budget and price range — it cannot withdraw; authorization auto-expires and can be revoked anytime via <code class="inl">setAgent(agent, 0)</code>.</div>
+      </div>
+    </section>
+
+    <section id="tax">
+      <div data-lang="zh">
+        <h2>项目方交易税</h2>
+        <p>项目方交易税由项目方自管，平台不代管、不设置。推荐实现识别标志 <code class="inl">sordexTax()</code>，使 SorDex 上与 AMM 一致地买扣一次、卖扣一次（扣的是 base）。</p>
+        <pre><span class="c">// 代币实现此接口，声明买/卖税率(bps,100=1%)与收款地址</span>
+function sordexTax() external view
+  returns (uint16 buyBps, uint16 sellBps, address recipient);</pre>
+        <p>对接两步：① 在代币实现 <code class="inl">sordexTax()</code>；② 把 SorDex 的订单簿 / 金库 / 结算合约加入代币自身转账税免税白名单。否则 base 进出合约两跳会各被原生税抽一次。单侧税率上限 20%，计价币 USDT 全程不抽税。未实现 <code class="inl">sordexTax()</code> 的普通抽税币仍可交易（按实际到账记账，会被抽两次）。</p>
+      </div>
+      <div data-lang="en">
+        <h2>Project transfer tax</h2>
+        <p>A project's transfer tax is self-managed; the platform neither sets nor custodies it. Implement the <code class="inl">sordexTax()</code> marker so that on SorDex the tax is charged once per buy and once per sell (deducted in base), like an AMM.</p>
+        <pre><span class="c">// token implements this to declare buy/sell rates (bps, 100=1%) and recipient</span>
+function sordexTax() external view
+  returns (uint16 buyBps, uint16 sellBps, address recipient);</pre>
+        <p>Two steps: (1) implement <code class="inl">sordexTax()</code> in the token; (2) add SorDex's order-book / vault / settler contracts to the token's own fee-exemption list — otherwise the native tax fires on both hops as base moves in and out of the contract. Per-side cap is 20%; the quote currency USDT is never taxed. Plain fee-on-transfer tokens without <code class="inl">sordexTax()</code> still trade (accounted by actual received amount, taxed twice).</p>
+      </div>
+    </section>
+
+    <section id="contracts">
+      <div data-lang="zh">
+        <h2>合约地址</h2>
+        <p>BSC 主网部署地址（chainId 56）。接入前请在 BscScan 核对。</p>
+        <table class="addr-tbl">
+          <tr><th>合约</th><th>地址</th></tr>
+          <tr><td class="a">ListingRegistry</td><td>0xBCb5f317FDeEeC3D5A98a98A99d6d60E849EA477</td></tr>
+          <tr><td class="a">SettlementOrderBook</td><td>0x3beCfBF418b46712A10a26212255B01823B81505</td></tr>
+          <tr><td class="a">MMCollateralVault</td><td>0x269d78A4E302A5E78Fdb6681D9D4fF002e86E63b</td></tr>
+          <tr><td class="a">SignedQuoteSettler</td><td>0xD5D43Ea31dEaFaeD32127516A1a2c381a0ef2f1d</td></tr>
+          <tr><td class="a">MixedTakeRouter</td><td>0xf8Bd78ed7622Bb3976BebB03D99eA5AAff71022D</td></tr>
+          <tr><td class="a">MarketMakerRegistry</td><td>0xBFF929d9acFA13eCd81812a98dFa946c6a37A94B</td></tr>
+          <tr><td class="a">FeeVault</td><td>0x2b0934913FEF658F0628F004Ff5451aF2b8C21e6</td></tr>
+          <tr><td class="a">USDT (quote)</td><td>0x55d398326f99059fF775485246999027B3197955</td></tr>
+        </table>
+      </div>
+      <div data-lang="en">
+        <h2>Contract addresses</h2>
+        <p>BSC mainnet deployment (chainId 56). Verify on BscScan before integrating.</p>
+        <table class="addr-tbl">
+          <tr><th>contract</th><th>address</th></tr>
+          <tr><td class="a">ListingRegistry</td><td>0xBCb5f317FDeEeC3D5A98a98A99d6d60E849EA477</td></tr>
+          <tr><td class="a">SettlementOrderBook</td><td>0x3beCfBF418b46712A10a26212255B01823B81505</td></tr>
+          <tr><td class="a">MMCollateralVault</td><td>0x269d78A4E302A5E78Fdb6681D9D4fF002e86E63b</td></tr>
+          <tr><td class="a">SignedQuoteSettler</td><td>0xD5D43Ea31dEaFaeD32127516A1a2c381a0ef2f1d</td></tr>
+          <tr><td class="a">MixedTakeRouter</td><td>0xf8Bd78ed7622Bb3976BebB03D99eA5AAff71022D</td></tr>
+          <tr><td class="a">MarketMakerRegistry</td><td>0xBFF929d9acFA13eCd81812a98dFa946c6a37A94B</td></tr>
+          <tr><td class="a">FeeVault</td><td>0x2b0934913FEF658F0628F004Ff5451aF2b8C21e6</td></tr>
+          <tr><td class="a">USDT (quote)</td><td>0x55d398326f99059fF775485246999027B3197955</td></tr>
+        </table>
+      </div>
+    </section>
+
+    <section id="onchain">
+      <div data-lang="zh">
+        <h2>核心合约函数</h2>
+        <p>挂单 / 撤单 / 改价 / 吃单 / 建对 / 充提均由你自付 gas，平台不代付。</p>
+        <h3>SettlementOrderBook</h3>
+        <pre>placeBuy(pairId, qty, priceNum, priceDen, expiry)    <span class="c">// 挂买单，锁 USDT</span>
+placeSell(pairId, qty, priceNum, priceDen, expiry)   <span class="c">// 挂卖单，锁 base</span>
+cancelOrder(id)                                      <span class="c">// 撤单</span>
+amendOrder(id, newPriceNum, newPriceDen, newQty)     <span class="c">// 改价 / 改量</span></pre>
+        <h3>MixedTakeRouter</h3>
+        <pre>takeMixed(params)   <span class="c">// 一笔同时吃链上 A 单 + 签名 B 单，带代付接口</span></pre>
+        <h3>MMCollateralVault</h3>
+        <pre>deposit(token, amount)          <span class="c">// 充值做市保证金</span>
+availableOf(maker, token)       <span class="c">// 查可用额</span>
+requestWithdraw(token, amount)  <span class="c">// 发起提现（有争议窗口）</span></pre>
+        <h3>SignedQuoteSettler</h3>
+        <pre>minValidNonce(maker)            <span class="c">// 当前作废水位；新签 nonce 须 &gt;= 此值</span>
+cancelQuoteUpTo(newMinNonce)    <span class="c">// 一次性作废某 nonce 以下全部签名单</span>
+hashQuote(quote) -&gt; bytes32     <span class="c">// 计算 quoteHash</span>
+setAgent(agent, expiry)         <span class="c">// 授权 / 撤销代理（见 代理自动挂单）</span>
+isAuthorizedAgent(maker, agent) <span class="c">// 查代理授权</span></pre>
+        <h3>ListingRegistry</h3>
+        <pre>createPair(base, tickNum, tickDen, minBaseQty, minNotional, openTime)  <span class="c">// 无许可建对</span>
+getPair(pairId)  <span class="c">// 读交易对链上参数</span></pre>
+        <div class="note">新签报价的 <code class="inl">nonce</code> 须 ≥ <code class="inl">minValidNonce(maker)</code>，否则一出生即无效。启动时先读一次对齐。切换托管模式、撤销代理、或代理到期后重新授权时，水位会一次推进 1,000,000，之前签的单全部作废，需要重新读水位后再签。</div>
+        <div class="note">直接调合约吃单时，请一律带"最少到手量"：<code class="inl">takeMixed</code> 的 <code class="inl">minTakerOut</code> 不要传 0，订单簿用 <code class="inl">takeOrdersMin</code>。代币声明的税率在成交时按实时值收取，不带下限的话，代币方在你成交前临时调高税率，你会少收到币。</div>
+        <div class="note">挂限价单前先确认价格不会和对面最优价立即成交。能立即成交的部分请走 <code class="inl">takeMixed</code> 吃单，剩下的再挂；直接挂上去的话，任何人都可以另挂一张按你限价的对手单来撮合，你会按自己的限价、而不是盘口更好的价格成交。</div>
+      </div>
+      <div data-lang="en">
+        <h2>Core contract calls</h2>
+        <p>Placing, cancelling, amending, taking, listing and vault ops all cost your own gas; the platform never pays it.</p>
+        <h3>SettlementOrderBook</h3>
+        <pre>placeBuy(pairId, qty, priceNum, priceDen, expiry)    <span class="c">// bid, locks USDT</span>
+placeSell(pairId, qty, priceNum, priceDen, expiry)   <span class="c">// ask, locks base</span>
+cancelOrder(id)                                      <span class="c">// cancel</span>
+amendOrder(id, newPriceNum, newPriceDen, newQty)     <span class="c">// reprice / resize</span></pre>
+        <h3>MixedTakeRouter</h3>
+        <pre>takeMixed(params)   <span class="c">// take on-chain A-orders + signed B-orders in one tx, with on-behalf interface</span></pre>
+        <h3>MMCollateralVault</h3>
+        <pre>deposit(token, amount)          <span class="c">// deposit MM collateral</span>
+availableOf(maker, token)       <span class="c">// query available</span>
+requestWithdraw(token, amount)  <span class="c">// request withdrawal (dispute window)</span></pre>
+        <h3>SignedQuoteSettler</h3>
+        <pre>minValidNonce(maker)            <span class="c">// invalidation watermark; new nonce must be &gt;= this</span>
+cancelQuoteUpTo(newMinNonce)    <span class="c">// invalidate all signed quotes below a nonce</span>
+hashQuote(quote) -&gt; bytes32     <span class="c">// compute the quoteHash</span>
+setAgent(agent, expiry)         <span class="c">// authorize / revoke an agent (see Agent quoting)</span>
+isAuthorizedAgent(maker, agent) <span class="c">// check agent authorization</span></pre>
+        <h3>ListingRegistry</h3>
+        <pre>createPair(base, tickNum, tickDen, minBaseQty, minNotional, openTime)  <span class="c">// permissionless listing</span>
+getPair(pairId)  <span class="c">// read on-chain pair parameters</span></pre>
+        <div class="note">A new quote's <code class="inl">nonce</code> must be ≥ <code class="inl">minValidNonce(maker)</code>, otherwise it is born invalid. Read it once at startup to align. Switching custody mode, revoking an agent, or re-authorizing an agent after it expired moves the watermark forward by 1,000,000 at once; every quote signed before that is void, so read the watermark again before signing.</div>
+        <div class="note">When you take directly on the contracts, always set a minimum amount out: never pass 0 for <code class="inl">minTakerOut</code> in <code class="inl">takeMixed</code>, and use <code class="inl">takeOrdersMin</code> on the order book. Declared token taxes are charged at the live rate when you trade, so without a minimum a token owner could raise the tax just before your trade and you would receive fewer tokens.</div>
+        <div class="note">Before resting a limit order, make sure its price would not trade immediately against the best price on the other side. Take the marketable part with <code class="inl">takeMixed</code> and rest only the remainder. Otherwise anyone can place an opposite order at your limit and match it, and you fill at your own limit instead of the better book price.</div>
+      </div>
+    </section>
+
+    <section id="listing">
+      <div data-lang="zh">
+        <h2>无许可建对</h2>
+        <p>上币无需审批：任何人用自己的钱包调登记表建对，计价币固定 USDT。</p>
+        <div class="ep"><div class="ep-head"><span class="m call">CALL</span><span class="path">ListingRegistry.createPair(base, tickNum, tickDen, minBaseQty, minNotional, openTime)</span></div><div class="ep-desc">链上建对（payable，建对费默认 0）。openTime 为开放交易时间戳（秒），0=立即；此前离线报价可进池但无人能吃，到点自动开放。护栏：base 须为合约、不得等于 USDT、同对不可重复、openTime 不得超过 7 天后。</div></div>
+        <div class="ep"><div class="ep-head"><span class="m post">POST</span><span class="path">/listing-meta</span><span class="auth">建对人签名</span></div><div class="ep-desc">建对成功后登记链下展示信息（logo、展示名、联系方式），纯展示、无特权。必须由<b>创建该交易对的钱包</b>做 EIP-712 签名（domain <code class="inl">SorDexListingMeta</code> v1，类型 <code class="inl">ListingMeta(uint256 pairId,string displayName,string logo,uint256 deadline)</code>，deadline 不超过 1 小时），并附建对交易的 <code class="inl">txHash</code>，服务端核对签名人就是建对人。首写锁定：同一 pairId 的信息一经登记不可再改，如需修改请联系平台。logo 仅接受 https。</div></div>
+        <pre>POST /api/listing-meta
+{
+  <span class="k">"pairId"</span>:<span class="s">"2"</span>, <span class="k">"logo"</span>:<span class="s">"https://…/logo.png"</span>, <span class="k">"displayName"</span>:<span class="s">"Demo Coin"</span>,
+  <span class="k">"contactTg"</span>:<span class="s">"@yourhandle"</span>, <span class="k">"contactEmail"</span>:<span class="s">"you@example.com"</span>,
+  <span class="k">"txHash"</span>:<span class="s">"0x…"</span>, <span class="k">"deadline"</span>:<span class="n">1794800000</span>, <span class="k">"signature"</span>:<span class="s">"0x…"</span>
+}
+
+200  → { <span class="k">"ok"</span>:true, <span class="k">"pairId"</span>:<span class="s">"2"</span> }</pre>
+      </div>
+      <div data-lang="en">
+        <h2>Permissionless listing</h2>
+        <p>Listing needs no approval: anyone creates a pair from their own wallet; the quote is always USDT.</p>
+        <div class="ep"><div class="ep-head"><span class="m call">CALL</span><span class="path">ListingRegistry.createPair(base, tickNum, tickDen, minBaseQty, minNotional, openTime)</span></div><div class="ep-desc">Create a pair on-chain (payable; creation fee defaults to 0). openTime is the opening timestamp (sec), 0=immediate; before it, off-chain quotes may enter the pool but nobody can take them, and it opens automatically. Guards: base must be a contract, must not equal USDT, the pair must not already exist, and openTime cannot be more than 7 days out.</div></div>
+        <div class="ep"><div class="ep-head"><span class="m post">POST</span><span class="path">/listing-meta</span><span class="auth">pair creator signature</span></div><div class="ep-desc">After creation, register off-chain display info (logo, name, contact). Display-only, no privilege. It must be signed (EIP-712) by <b>the wallet that created the pair</b> (domain <code class="inl">SorDexListingMeta</code> v1, type <code class="inl">ListingMeta(uint256 pairId,string displayName,string logo,uint256 deadline)</code>, deadline at most 1 hour ahead), together with the <code class="inl">txHash</code> of the pair-creation transaction; the server checks that the signer is the creator. First-write lock: once set, a pairId's metadata cannot be changed; contact the platform if it needs fixing. logo must be https.</div></div>
+        <pre>POST /api/listing-meta
+{
+  <span class="k">"pairId"</span>:<span class="s">"2"</span>, <span class="k">"logo"</span>:<span class="s">"https://…/logo.png"</span>, <span class="k">"displayName"</span>:<span class="s">"Demo Coin"</span>,
+  <span class="k">"contactTg"</span>:<span class="s">"@yourhandle"</span>, <span class="k">"contactEmail"</span>:<span class="s">"you@example.com"</span>,
+  <span class="k">"txHash"</span>:<span class="s">"0x…"</span>, <span class="k">"deadline"</span>:<span class="n">1794800000</span>, <span class="k">"signature"</span>:<span class="s">"0x…"</span>
+}
+
+200  → { <span class="k">"ok"</span>:true, <span class="k">"pairId"</span>:<span class="s">"2"</span> }</pre>
+      </div>
+    </section>
+
+    <section id="errors">
+      <div data-lang="zh">
+        <h2>错误码</h2>
+        <p>出错时返回对应 HTTP 状态码与 <code class="inl">{"error":"…"}</code>，报价类错误另带 <code class="inl">code</code> 字段便于程序判断。不存在的接口统一返回 404 <code class="inl">{"error":"Not found."}</code>；请求体格式错误返回 400（不是 JSON 时为 415）。</p>
+        <table>
+          <tr><th>状态</th><th>含义</th></tr>
+          <tr><td>400</td><td class="d">请求参数无效：地址 / hash / pairId 格式错、缺必填项、未知交易对、IP 白名单非法</td></tr>
+          <tr><td>401</td><td class="d">需要签名 / 签名已过期 / 签名无效；或报价需带 x-mm-key 而未带</td></tr>
+          <tr><td>403</td><td class="d">Key 与报价地址不匹配、IP 不在白名单、授权额度做市缺 Key、地址已被平台停用</td></tr>
+          <tr><td>404</td><td class="d">该地址尚无可用 API Key、退订的交易对没有订阅、接口不存在</td></tr>
+          <tr><td>413 / 415</td><td class="d">请求体过大 / 请求体不是 JSON</td></tr>
+          <tr><td>409</td><td class="d">签名已被使用（重放）、该交易对信息已登记</td></tr>
+          <tr><td>429</td><td class="d">触发限流，请稍后再试</td></tr>
+          <tr><td>500</td><td class="d">服务端内部错误</td></tr>
+          <tr><td>502</td><td class="d">链上读取失败（代理校验 / 预算查询）</td></tr>
+          <tr><td>503</td><td class="d">服务未就绪 / 签名池未启用 / 托管做市未启用 / Settler 未配置</td></tr>
+          <tr><td>507</td><td class="d">上币元数据存储已满</td></tr>
+        </table>
+        <h3>报价错误码（<code class="inl">/quote</code>、<code class="inl">/quote/batch</code> 的 <code class="inl">code</code> 字段）</h3>
+        <table>
+          <tr><th>code</th><th>含义</th></tr>
+          <tr><td>BELOW_POOL_MIN_NOTIONAL</td><td class="d">单张报价成交额低于 0.5 USDT</td></tr>
+          <tr><td>NOT_COVERED</td><td class="d">同方向池内报价总量超过可用资金</td></tr>
+          <tr><td>BUDGET_UNKNOWN</td><td class="d">暂时读不到可用资金，稍后重试</td></tr>
+          <tr><td>POOL_FULL</td><td class="d">报价池已满，稍后重试</td></tr>
+          <tr><td>MAKER_QUOTE_LIMIT</td><td class="d">该 maker 池内报价已达上限（200 条）</td></tr>
+          <tr><td>BAD_TICK / BELOW_MIN_QTY / BELOW_MIN_NOTIONAL</td><td class="d">不符合交易对链上的价格档位 / 最小数量 / 最小成交额</td></tr>
+          <tr><td>WOULD_CROSS</td><td class="d">GTC 限价会和对面最优价立即成交；返回里带 <code class="inl">bestPrice</code>，请先用 IOC 吃单</td></tr>
+          <tr><td>STALE_NONCE / QUOTE_CANCELLED</td><td class="d">nonce 已被作废 / 该报价已被撤销</td></tr>
+          <tr><td>SIG_MALFORMED / SIG_NON_CANONICAL / SIGNER_NOT_AUTHORIZED</td><td class="d">签名格式错误 / 非规范签名 / 签名人不是 maker 也不是其授权代理</td></tr>
+        </table>
+      </div>
+      <div data-lang="en">
+        <h2>Error codes</h2>
+        <p>Errors return the matching HTTP status and <code class="inl">{"error":"…"}</code>; quote errors also carry a <code class="inl">code</code> field for programmatic handling. Unknown endpoints return 404 <code class="inl">{"error":"Not found."}</code>; a malformed body returns 400 (415 if it isn't JSON).</p>
+        <table>
+          <tr><th>status</th><th>meaning</th></tr>
+          <tr><td>400</td><td class="d">invalid params: malformed address / hash / pairId, missing field, unknown pair, invalid IP allowlist</td></tr>
+          <tr><td>401</td><td class="d">signature required / expired / invalid; or quote missing a required x-mm-key</td></tr>
+          <tr><td>403</td><td class="d">key–maker mismatch, IP not in allowlist, allowance-mode quoting without a key, address suspended by the platform</td></tr>
+          <tr><td>404</td><td class="d">no active API key for this address, no subscription to cancel for that pair, or unknown endpoint</td></tr>
+          <tr><td>413 / 415</td><td class="d">request body too large / request body is not JSON</td></tr>
+          <tr><td>409</td><td class="d">signature already used (replay), listing metadata already registered</td></tr>
+          <tr><td>429</td><td class="d">rate limited; retry later</td></tr>
+          <tr><td>500</td><td class="d">internal server error</td></tr>
+          <tr><td>502</td><td class="d">on-chain read failed (agent check / budget query)</td></tr>
+          <tr><td>503</td><td class="d">service not ready / quote pool disabled / hosted MM disabled / settler not configured</td></tr>
+          <tr><td>507</td><td class="d">listing metadata store is full</td></tr>
+        </table>
+        <h3>Quote error codes (the <code class="inl">code</code> field of <code class="inl">/quote</code> and <code class="inl">/quote/batch</code>)</h3>
+        <table>
+          <tr><th>code</th><th>meaning</th></tr>
+          <tr><td>BELOW_POOL_MIN_NOTIONAL</td><td class="d">the quote is worth less than 0.5 USDT</td></tr>
+          <tr><td>NOT_COVERED</td><td class="d">quotes on this side would exceed your available funds</td></tr>
+          <tr><td>BUDGET_UNKNOWN</td><td class="d">available funds can't be read right now; retry shortly</td></tr>
+          <tr><td>POOL_FULL</td><td class="d">the quote pool is full; retry shortly</td></tr>
+          <tr><td>MAKER_QUOTE_LIMIT</td><td class="d">this maker already has the maximum of 200 quotes in the pool</td></tr>
+          <tr><td>BAD_TICK / BELOW_MIN_QTY / BELOW_MIN_NOTIONAL</td><td class="d">does not meet the pair's on-chain tick / minimum size / minimum notional</td></tr>
+          <tr><td>WOULD_CROSS</td><td class="d">the GTC limit would trade immediately against the best price on the other side; the response includes <code class="inl">bestPrice</code>. Send IOC first</td></tr>
+          <tr><td>STALE_NONCE / QUOTE_CANCELLED</td><td class="d">nonce already invalidated / quote already cancelled</td></tr>
+          <tr><td>SIG_MALFORMED / SIG_NON_CANONICAL / SIGNER_NOT_AUTHORIZED</td><td class="d">malformed signature / non-canonical signature / signer is neither the maker nor its authorized agent</td></tr>
+        </table>
+      </div>
+    </section>
+
+    <div class="foot">
+      <span data-lang="zh">SORDEX · 非托管现货订单簿 DEX · 本页为静态文档，合约地址取自当前 BSC 主网部署</span>
+      <span data-lang="en">SORDEX · Non-custodial spot order-book DEX · static document; addresses from the current BSC mainnet deployment</span>
+    </div>
+  </main>
+</div>
+
+<script src="/api-lang.js"></script>
+</body>
+</html>

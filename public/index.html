@@ -1,0 +1,773 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="format-detection" content="telephone=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#07090d">
+<script src="/theme-init.js?v=1"></script>
+<title>SORDEX · 现货交易</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Roboto+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="/app.css?v=20261117t1">
+<link rel="stylesheet" href="/v2.css?v=20261117t1">
+</head>
+<body>
+
+<header class="top">
+  <a class="brand" href="/" data-route aria-label="SORDEX"><img src="/logo.png?v=1" alt="SORDEX"></a>
+  <nav class="nav" id="nav">
+    <a href="/" data-route data-view="home" data-i18n="nav.home">首页</a>
+    <a href="/markets" data-route data-view="markets" data-i18n="nav.markets">行情</a>
+    <a href="/trade" data-route data-view="trade" data-i18n="nav.trade">交易</a>
+    <a href="/swap" data-route data-view="swap" data-i18n="nav.swap">快捷交易</a>
+    <a href="/pool" data-route data-view="pool" data-i18n="nav.pool">流动性</a>
+    <a href="/mm" data-route data-view="mm" data-i18n="nav.mmpro">做市商</a>
+  </nav>
+  <div class="top-right">
+    <div class="searchwrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="pairSearch" autocomplete="off" spellcheck="false" placeholder="搜索交易对" aria-label="搜索交易对" data-i18n-ph="wallet.search">
+      <kbd>/</kbd>
+      <div class="searchlist" id="pairSearchList" hidden></div>
+    </div>
+    <a class="apilink" href="/api.html"><span data-i18n="nav.api">API</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M9 7h8v8"/></svg></a>
+    <button class="themebtn" id="themeBtn" aria-label="theme" data-i18n-title="theme.toggle"><svg class="ic-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg><svg class="ic-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z"/></svg></button>
+    <div class="lang" id="lang"><button data-lang="zh" class="on">中</button><button data-lang="en">EN</button></div>
+    <div class="walletwrap">
+      <button class="connect" id="connect"><span class="w-ava"></span><span class="w-txt" id="connectTxt" data-i18n="wallet.connect">连接钱包</span><span class="w-short" data-i18n="wallet.connectShort">连接</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
+    </div>
+    <button class="hamb" id="hamb" aria-label="menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+  </div>
+</header>
+
+<div class="scrim" id="scrim" hidden></div>
+<aside class="drawer" id="drawer" hidden aria-label="menu">
+  <div class="dw-top">
+    <a class="brand" href="/" data-route aria-label="SORDEX"><img src="/logo.png?v=1" alt="SORDEX"></a>
+    <button class="dw-close" id="dwClose" aria-label="close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+  </div>
+  <div class="dw-body">
+    <button class="dw-connect" id="dwConnect" data-i18n="wallet.connect">连接钱包</button>
+    <nav class="dw-menu" id="dwMenu"><a href="/" data-route data-view="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11 12 4l8 7"/><path d="M6 10v9h12v-9"/></svg><span data-i18n="nav.home">-</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></a><a href="/markets" data-route data-view="markets"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20V9"/><path d="M12 20V4"/><path d="M19 20v-7"/></svg><span data-i18n="nav.markets">-</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></a><a href="/trade" data-route data-view="trade"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h13l-3.5-3.5"/><path d="M20 16H7l3.5 3.5"/></svg><span data-i18n="nav.trade">-</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></a><a href="/swap" data-route data-view="swap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 3 4 14h7l-1 7 9-11h-7l1-7Z"/></svg><span data-i18n="nav.swap">-</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></a><a href="/pool" data-route data-view="pool"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg><span data-i18n="nav.poolList">-</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></a><a href="/mm" data-route data-view="mm" data-mmkey><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.2"/><path d="M5 20c0-3.3 3.1-5.5 7-5.5s7 2.2 7 5.5"/></svg><span data-i18n="nav.mmKey">-</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></a><a href="/account" data-route data-view="account"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="6" width="17" height="13" rx="2.5"/><path d="M3.5 10h17"/><path d="M15.5 14.5h2"/></svg><span data-i18n="nav.account">-</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></a><a class="dw-ext" href="/api.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 5h5v5M19 5l-8 8M19 13v6H5V5h6"/></svg><span data-i18n="nav.apiDocs">API 文档</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 5h5v5M19 5l-8 8M19 13v6H5V5h6"/></svg></a></nav>
+    <div class="dw-lang">
+      <span class="dw-lang-l"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/></svg><span data-i18n="acct.colors">涨跌颜色</span></span>
+      <div class="seg-mini dw-seg" id="colorSeg"><button data-colors="green-up" data-i18n="acct.greenUpS">绿涨</button><button data-colors="red-up" data-i18n="acct.redUpS">红涨</button></div>
+    </div>
+    <div class="dw-lang">
+      <span class="dw-lang-l"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z"/></svg><span data-i18n="theme.label">外观</span></span>
+      <div class="seg-mini dw-seg" id="themeSeg"><button data-theme="dark" data-i18n="theme.dark">深色</button><button data-theme="light" data-i18n="theme.light">浅色</button></div>
+    </div>
+    <div class="dw-lang">
+      <span class="dw-lang-l"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.7 2.5 15.3 0 18M12 3c-2.5 2.7-2.5 15.3 0 18"/></svg><span data-i18n="nav.lang">语言</span></span>
+      <div class="lang" id="langDw"><button data-lang="zh">中</button><button data-lang="en">EN</button></div>
+    </div>
+    <button class="dw-out" id="dwDisconnect" data-i18n="wallet.disconnect" hidden>断开连接</button>
+  </div>
+</aside>
+
+<div class="statusbar" id="statusBar">
+  <div class="sb-in">
+    <span class="sb-item"><span class="dot" id="statusDot"></span><span id="statusText" data-i18n="status.connecting">正在连接网络…</span></span>
+    <span class="sb-sep"></span>
+    <span class="sb-item"><span class="k" data-i18n="wallet.network">网络</span><b id="sbNet">BSC</b></span>
+    <span class="sb-item"><span class="k" data-i18n="wallet.quote">可用 USDT</span><b id="sbQuote">-</b></span>
+    <span class="sb-item"><span class="k" id="sbBaseK" data-i18n="wallet.base">可用基础币</span><b id="sbBase">-</b></span>
+    <span class="sb-sp"></span>
+    <span class="sb-addr" id="sbAddrWrap" hidden><span id="acctText"></span><button class="sb-copy" id="sbCopy" data-i18n-title="wallet.copy" title="复制"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/></svg></button></span>
+    <button class="sb-out" id="sbDisconnect" hidden data-i18n="wallet.disconnect">断开连接</button>
+  </div>
+</div>
+
+<main class="view h-view" id="viewHome" hidden>
+  <section class="h-hero">
+    <i class="h-glow mint"></i><i class="h-glow purple"></i>
+    <div class="h-copy">
+      <span class="h-eyebrow"><i></i><span data-i18n="home.badge">无许可 · 链上订单簿</span></span>
+      <h1 class="h-title"><span class="h-grad" data-i18n="home.title1">非托管</span><br><span data-i18n="home.title2">现货订单簿 DEX</span></h1>
+      <p class="h-sub" data-i18n="home.sub">挂单即把资产锁进合约，成交一笔原子交割，资产直接回你钱包。平台没有充值提现，也无权动用你的资金。</p>
+      <div class="h-cta">
+        <a class="h-btn pri" href="/trade" data-route data-i18n="home.ctaTrade">开始交易</a>
+        <a class="h-btn sec" href="/pool" data-route data-i18n="home.ctaList">添加流动性 · 上币</a>
+      </div>
+      <div class="h-trust"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span data-i18n="home.chk1">非托管</span></span><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span data-i18n="home.chk2">原子交割</span></span><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span data-i18n="home.chk3">无充值提现</span></span></div>
+    </div>
+    <div class="h-term" id="heroCard" hidden>
+      <div class="ht-head">
+        <span class="ht-ava" id="hcLogo"></span>
+        <div class="ht-pair"><b id="hcSym">-</b><span id="hcSub"></span></div>
+        <span class="t-sp"></span>
+        <div class="ht-px"><b id="hcPrice">-</b><span class="ht-chg" id="hcChg"></span></div>
+      </div>
+      <div class="ht-chart" id="hcSpark"></div>
+      <div class="ht-book">
+        <div class="ht-cols"><span><span data-i18n="book.price">价格</span> (<span class="qsym">USDT</span>)</span><span><span data-i18n="book.qty">数量</span> (<span class="bsymh">-</span>)</span><span data-i18n="book.total">合计</span></div>
+        <div id="hcAsks"></div>
+        <div class="ht-mid" id="hcMid">-</div>
+        <div id="hcBids"></div>
+      </div>
+      <div class="ht-act"><button class="ht-buy" id="hcBuy">-</button><button class="ht-sell" id="hcSell">-</button></div>
+    </div>
+  </section>
+
+  <section class="h-stats">
+    <div class="h-stat"><b id="statTvl">-</b><span data-i18n="home.tvl">总锁仓 TVL</span></div>
+    <div class="h-stat"><b id="statVol">-</b><span data-i18n="home.vol24">24h 交易量</span></div>
+    <div class="h-stat"><b id="statPairs">-</b><span data-i18n="home.listed">上线币种</span></div>
+    <div class="h-stat"><b>0.30%</b><span data-i18n="home.factTaker">吃单手续费</span></div>
+    <div class="h-stat"><b>1 tx</b><span data-i18n="home.factTx">原子交割</span></div>
+  </section>
+
+  <section class="h-feat">
+    <div class="h-feat-head"><span class="h-eyebrow2" data-i18n="home.eyebrow">为什么选 SORDEX</span><h2 data-i18n="home.whyTitle">无许可交易，不交出资产托管</h2></div>
+    <div class="h-cards">
+      <div class="h-card"><span class="h-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 5 6v5c0 4.4 3 8.3 7 9.5 4-1.2 7-5.1 7-9.5V6z"/></svg></span><h3 data-i18n="home.f1t">非托管订单簿</h3><p data-i18n="home.f1d">-</p></div>
+      <div class="h-card"><span class="h-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg></span><h3 data-i18n="home.f2t">无许可上币</h3><p data-i18n="home.f2d">-</p></div>
+      <div class="h-card"><span class="h-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 5 5 19"/><circle cx="7" cy="7" r="2.5"/><circle cx="17" cy="17" r="2.5"/></svg></span><h3 data-i18n="home.f3t">项目方自管税</h3><p data-i18n="home.f3d">-</p></div>
+      <div class="h-card"><span class="h-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg></span><h3 data-i18n="home.f4t">聚合商可收录</h3><p data-i18n="home.f4d">-</p></div>
+    </div>
+  </section>
+
+  <section class="h-mkts" id="homeRecommend" hidden>
+    <div class="h-mkts-head"><h2 data-i18n="home.recommend2">推荐行情</h2><a class="h-more" href="/markets" data-route><span data-i18n="home.viewAll">查看全部</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></a></div>
+    <div class="h-table">
+      <div class="h-tr h-th"><span data-i18n="t.pair">交易对</span><span data-i18n="t.price">价格</span><span data-i18n="mkt.chg">24h涨跌</span><span data-i18n="t.action">操作</span></div>
+      <div id="homeMarketsBody"></div>
+    </div>
+    <p class="t-empty hide" id="homeMarketsEmpty" data-i18n="mkt.empty">还没有已上线的交易对。</p>
+  </section>
+
+  <section class="h-ctaw">
+    <div class="h-band">
+      <i class="h-glow purple"></i><i class="h-glow mint"></i>
+      <div class="h-band-txt"><h2 data-i18n="home.ctaCardTitle">现在就开始交易，或几分钟内发行你的代币</h2><p data-i18n="home.ctaCardSub">-</p></div>
+      <div class="h-band-act">
+        <a class="h-btn pri" href="/trade" data-route data-i18n="home.ctaTrade">开始交易</a>
+        <a class="h-btn sec" href="/pool" data-route data-i18n="home.ctaList">添加流动性 · 上币</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<main id="viewTrade" class="t-view" hidden>
+
+  <section class="t-bar">
+    <div class="t-pair" id="tkId">
+      <span class="t-ava" id="barLogo"></span>
+      <div class="t-pair-txt">
+        <button class="t-pair-btn" id="tradePairBtn" type="button" aria-haspopup="listbox"><span id="barPair">-</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
+        <span class="t-pair-sub" id="barSub"></span>
+      </div>
+      <div class="pairpicker" id="tradePairPicker" hidden>
+        <div class="pp-head"><b data-i18n="pp.title">选择交易对</b><button class="pp-close" id="ppClose" aria-label="close">×</button></div>
+        <input id="tradePairSearch" autocomplete="off" spellcheck="false" placeholder="搜索交易对" data-i18n-ph="wallet.search">
+        <div class="pp-dims" id="ppDims"><button class="on" data-ppdim="all" data-i18n="mkt.dimAll">全部</button><button data-ppdim="fav" data-i18n="mkt.dimFav">自选</button></div>
+        <div class="pairpicker-list" id="tradePairList"></div>
+      </div>
+    </div>
+    <span class="t-vdiv"></span>
+    <div class="t-last">
+      <b class="t-px" id="lastPrice">-</b>
+      <span class="t-usd" id="barUsd"></span>
+      <div class="t-chgrow"><span class="t-chgpill" id="chgPct">-</span><span class="t-24">24h</span></div>
+    </div>
+    <div class="t-hl">
+      <div><span data-i18n="tk.high">24h最高</span><b id="barHigh">-</b></div>
+      <div><span data-i18n="tk.low">24h最低</span><b id="barLow">-</b></div>
+      <div><span data-i18n="t.vol24s">24h量</span><b id="barVolM">-</b></div>
+    </div>
+    <div class="t-stats">
+      <div><span data-i18n="mkt.chg">24h涨跌</span><b id="barChg">-</b></div>
+      <div><span data-i18n="ticker.vol">24h成交额</span><b id="barVol">-</b></div>
+      <div><span data-i18n="ticker.bid">买一</span><b class="up" id="barBid">-</b></div>
+      <div><span data-i18n="ticker.ask">卖一</span><b class="down" id="barAsk">-</b></div>
+      <div><span data-i18n="ticker.spread">价差</span><b id="barSpread">-</b></div>
+      <div><span data-i18n="ticker.fee">手续费</span><b id="barFee">-</b></div>
+    </div>
+    <button class="t-ctoggle" id="chartToggleTop" type="button" aria-label="chart"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V11M10 19V5M16 19v-6M20 19v-9"/></svg><span data-i18n="chart.toggle">K线</span></button>
+    <a class="t-details" id="tokenDetailsBtn" data-route href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg><span data-i18n="ticker.details">币种详情</span></a>
+  </section>
+
+  <section class="t-quote">
+    <div><span data-i18n="ticker.bid">买一</span><b class="up" id="qBid">-</b></div>
+    <div><span data-i18n="ticker.ask">卖一</span><b class="down" id="qAsk">-</b></div>
+    <div><span data-i18n="ticker.spread">价差</span><b id="qSpread">-</b></div>
+    <div><span data-i18n="ticker.fee">手续费</span><b id="qFee">-</b></div>
+  </section>
+
+  <section class="t-card t-chart" id="chartPanel">
+    <div class="t-chart-head">
+      <div class="t-ctabs" id="chTabs">
+        <button class="on" data-cmode="chart" data-i18n="chart.chart">图表</button>
+        <button data-cmode="depth" data-i18n="chart.depth">深度</button>
+      </div>
+      <span class="t-hdiv"></span>
+      <div class="t-tf" id="chTf">
+        <button data-tf="20">1m</button>
+        <button data-tf="60" class="t-tf-5m">5m</button>
+        <button class="on" data-tf="120">15m</button>
+        <button data-tf="480">1H</button>
+        <button data-tf="1920">4H</button>
+        <button data-tf="11520">1D</button>
+      </div>
+      <span class="t-sp"></span>
+      <span class="t-fills" id="chartSrc"><i></i><span data-i18n="chart.src">链上成交</span></span>
+      <select id="pairSel" class="hide"></select>
+    </div>
+    <div class="t-plot"><canvas id="chart"></canvas></div>
+    <div class="legend" id="chartLegend"></div>
+  </section>
+
+  <section class="t-card t-book">
+    <div class="t-book-head">
+      <span class="t-ttl" data-i18n="book.title">订单簿</span>
+      <span class="t-sp"></span>
+      <select class="t-group" id="depthGroup" aria-label="group"></select>
+      <span class="t-tag" data-i18n="book.lockedTag">链上锁仓单</span>
+    </div>
+    <div class="t-book-cols"><span><span data-i18n="book.price">价格</span><span class="t-u" id="colPxU"></span></span><span><span data-i18n="book.qty">数量</span><span class="t-u" id="colQtyU"></span></span><span data-i18n="book.total">合计</span></div>
+    <div class="asks" id="asks"></div>
+    <div class="t-mid" id="mid">-</div>
+    <div class="bids" id="bids"></div>
+    <div class="t-spread" id="bookSpread"></div>
+  </section>
+
+  <section class="t-card t-form" id="orderForm">
+    <div class="t-side" id="sideTabs">
+      <button class="on" data-side="buy" data-i18n="order.buy">买入</button>
+      <button data-side="sell" data-i18n="order.sell">卖出</button>
+    </div>
+    <div class="t-type">
+      <span class="t-type-l" data-i18n="order.type">类型</span>
+      <div class="t-chips" id="typeSeg">
+        <button class="on" data-type="limit" data-i18n="order.limit">限价</button>
+        <button data-type="market" data-i18n="order.market">市价</button>
+      </div>
+      <label class="t-dd"><select id="typeSel"><option value="limit" data-i18n="order.limit">限价</option><option value="market" data-i18n="order.market">市价</option></select><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></label>
+    </div>
+    <div class="t-field" id="priceField">
+      <span class="t-fl"><span data-i18n="order.lPrice">价格</span> (<span class="qsym">USDT</span>)</span>
+      <div class="t-box">
+        <span class="t-bl" data-i18n="order.lPrice">价格</span>
+        <button class="t-step" type="button" data-pxstep="-1" aria-label="-"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></svg></button>
+        <input id="price" inputmode="decimal" placeholder="0.00" autocomplete="off">
+        <button class="t-step" type="button" data-pxstep="1" aria-label="+"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></button>
+        <span class="t-suf qsym">USDT</span>
+      </div>
+    </div>
+    <div class="t-field t-f-qty">
+      <span class="t-fl"><span data-i18n="order.lQty">数量</span> (<span class="bsym">-</span>)</span>
+      <div class="t-box">
+        <span class="t-bl" data-i18n="order.lQty">数量</span>
+        <button class="t-step t-mo" type="button" data-qtystep="-1" aria-label="-"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></svg></button>
+        <input id="qty" inputmode="decimal" placeholder="0.00" autocomplete="off">
+        <button class="t-step t-mo" type="button" data-qtystep="1" aria-label="+"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></button>
+        <span class="t-suf" id="qtyUnit">-</span>
+      </div>
+    </div>
+    <div class="t-field t-f-total">
+      <span class="t-fl"><span data-i18n="order.lTotal">成交额</span> (<span class="qsym">USDT</span>)</span>
+      <div class="t-box">
+        <span class="t-bl" data-i18n="order.lTotal">成交额</span>
+        <input id="total" inputmode="decimal" placeholder="0.00" autocomplete="off">
+        <span class="t-suf qsym">USDT</span>
+      </div>
+    </div>
+    <div class="t-pcts" id="pcts">
+      <button data-pct="25">25%</button><button data-pct="50">50%</button><button data-pct="75">75%</button><button data-pct="100">100%</button>
+    </div>
+    <div class="t-avbl"><span data-i18n="order.avbl">可用</span><b id="availM">-</b></div>
+    <div class="t-div"></div>
+
+    <div class="t-sumwrap" id="sumWrap">
+      <dl class="t-sum">
+        <div><dt data-i18n="order.youPay">你将付出</dt><dd id="youPay">-</dd></div>
+        <div><dt data-i18n="order.youGet">你将到手</dt><dd id="youGet">-</dd></div>
+        <div><dt data-i18n="order.notional">成交额</dt><dd id="notional">-</dd></div>
+        <div><dt data-i18n="order.fee">协议手续费</dt><dd id="feeView">-</dd></div>
+        <div><dt data-i18n="order.available">可用余额</dt><dd id="avail">-</dd></div>
+        <div><dt data-i18n="order.locked">挂单锁定</dt><dd id="locked">-</dd></div>
+        <div><dt data-i18n="order.tax">项目方税</dt><dd id="taxView">-</dd></div>
+      </dl>
+      <p class="crosshint" id="crossHint"></p>
+      <p class="crosshint sdxwarn" id="sdxWarn" hidden></p>
+      <p class="estnote" id="estNote"></p>
+      <div class="t-gas"><span class="t-gas-i"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg></span><span class="t-gas-l"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span><span data-i18n="order.gasNote">挂单、撤单、改价都需要你支付链上手续费（gas）。平台不代付。</span></div>
+    </div>
+    <button class="t-submit" id="submit" data-i18n="order.submitBuy">买入</button>
+    <p class="err" id="err"></p>
+  </section>
+
+  <section class="t-card t-sumcard" id="sumCard">
+    <button class="t-sumhead" id="sumToggle" type="button"><span data-i18n="order.summary">订单摘要</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
+    <div id="sumSlot"></div>
+  </section>
+
+  <section class="t-card t-orders">
+    <div class="t-otabs" id="bottomTabs">
+      <button class="on" data-tab="orders" data-i18n="tab.orders">当前委托</button>
+      <button data-tab="trades" data-i18n="tab.myTrades">我的成交</button>
+      <button class="t-mo" data-tab="markets" data-i18n="nav.markets">行情</button>
+      <span class="t-sp"></span>
+      <span class="t-locknote"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><span data-i18n="tab.lockNote">挂单资产锁在合约里，成交或撤单前不会动</span></span>
+    </div>
+    <div id="tabOrders" class="t-pane">
+      <table class="t-otable">
+        <thead><tr>
+          <th data-i18n="t.time">时间</th><th data-i18n="t.pair">交易对</th><th data-i18n="t.side">方向</th><th data-i18n="t.price">价格</th>
+          <th data-i18n="t.qty">数量</th><th data-i18n="t.filled">已成交</th><th data-i18n="t.status">状态</th><th class="r" data-i18n="t.action">操作</th>
+        </tr></thead>
+        <tbody id="ordersBody"></tbody>
+      </table>
+      <div class="t-ocards" id="ordersCards"></div>
+      <p class="t-empty" id="ordersEmpty" data-i18n="t.emptyOrders">还没有委托。挂单后，资产会锁定在合约里，直到成交、撤单或到期。</p>
+    </div>
+    <div id="tabTrades" class="t-pane hide">
+      <div class="trades-cap" id="tradesPair"></div>
+      <table class="t-ttable">
+        <thead><tr><th data-i18n="t.side">方向</th><th data-i18n="t.price">价格</th><th class="r" data-i18n="t.qty">数量</th><th class="r" data-i18n="t.total">成交额</th><th class="r" data-i18n="t.time">时间</th></tr></thead>
+        <tbody id="tradesBody"></tbody>
+      </table>
+      <p class="t-empty" id="tradesEmpty" data-i18n="t.connectMyTrades">连接钱包后，这里会显示你在这个交易对的成交。</p>
+    </div>
+  </section>
+
+  <section class="t-card t-mkts">
+    <div class="t-mk-head"><span class="t-ttl" data-i18n="nav.markets">行情</span><span class="t-sp"></span><span class="t-hint" data-i18n="mkt.tapHint">点一行切换交易对</span></div>
+    <div class="t-mk-dims" id="tradeMktDims">
+      <button class="on" data-tdim="volume" data-i18n="mkt.dimVol">成交额</button>
+      <button data-tdim="gainers" data-i18n="mkt.dimGain">涨幅榜</button>
+      <button data-tdim="new" data-i18n="mkt.dimNew">新币</button>
+      <button data-tdim="all" data-i18n="mkt.dimAll">全部</button>
+    </div>
+    <div class="t-mk-cols"><span data-i18n="t.pair">交易对</span><span data-i18n="t.price">价格</span><span data-i18n="mkt.chg">24h涨跌</span></div>
+    <div class="t-mk-list" id="tradeMktBody"></div>
+  </section>
+</main>
+
+<main class="grid single view" id="viewSwap" hidden>
+  <div class="swap-wrap">
+    <div class="swap-card">
+      <div class="swap-head">
+        <h2 data-i18n="swap.title">快捷交易</h2>
+        <p class="swap-sub" data-i18n="swap.sub">选币种与数量，按当前盘口市价成交</p>
+      </div>
+
+      <div class="swap-side" id="swapSideTabs">
+        <button type="button" data-sside="buy" class="on" data-i18n="swap.buy">买入</button>
+        <button type="button" data-sside="sell" data-i18n="swap.sell">卖出</button>
+      </div>
+
+      <div class="swap-field">
+        <div class="swap-field-top"><span data-i18n="swap.youPay">支付</span><span class="swap-top-right"><span class="swap-bal" id="swapPayBal"></span><span class="swap-tok" id="swapPayLabel">USDT</span></span></div>
+        <input id="swapPay" type="number" inputmode="decimal" placeholder="0.0" min="0" step="any" autocomplete="off">
+      </div>
+
+      <div class="swap-flip-row">
+        <button type="button" id="swapFlip" class="swap-flip" data-i18n-title="swap.flip" aria-label="flip">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4v14M7 18l-3-3M7 18l3-3M17 20V6M17 6l-3 3M17 6l3 3"/></svg>
+        </button>
+      </div>
+
+      <div class="swap-field">
+        <div class="swap-field-top"><span data-i18n="swap.youGet">预计获得</span><span class="swap-tok" id="swapGetLabel">TF</span></div>
+        <input id="swapGet" type="text" placeholder="0.0" readonly tabindex="-1">
+      </div>
+
+      <div class="swap-row">
+        <label data-i18n="swap.token">币种</label>
+        <select id="swapToken" class="swap-select"></select>
+      </div>
+
+      <div class="swap-row">
+        <label data-i18n="swap.slip">滑点上限</label>
+        <div class="swap-slip" id="swapSlip">
+          <button type="button" data-slip="50">0.5%</button>
+          <button type="button" data-slip="100" class="on">1%</button>
+          <button type="button" data-slip="200">2%</button>
+        </div>
+      </div>
+
+      <div class="swap-stats" id="swapStats" hidden></div>
+      <div class="swap-err" id="swapErr" hidden></div>
+
+      <button type="button" class="submit swap-submit" id="swapSubmit" data-i18n="swap.btnBuy">市价买入</button>
+    </div>
+  </div>
+</main>
+
+<main class="view m-view" id="viewMarkets" hidden>
+  <div class="m-title">
+    <div><h1 data-i18n="nav.markets">行情</h1><p data-i18n="mkt.sub">现货交易对，统一以 USDT 计价</p></div>
+    <label class="m-search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="mktSearch" autocomplete="off" spellcheck="false" placeholder="搜索交易对" data-i18n-ph="wallet.search"></label>
+  </div>
+  <div class="m-hl">
+    <section class="m-hc"><div class="m-hc-h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20V10M12 20V4M19 20v-7"/></svg><span data-i18n="mkt.topVol">成交额榜</span></div><div id="mktCardVol"></div></section>
+    <section class="m-hc"><div class="m-hc-h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/></svg><span data-i18n="mkt.topGain">涨幅榜</span></div><div id="mktCardGain"></div></section>
+    <section class="m-hc"><div class="m-hc-h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.5 5.5L20 9l-4 4 1 6-5-3-5 3 1-6-4-4 5.5-.5z"/></svg><span data-i18n="mkt.topNew">新上线</span></div><div id="mktCardNew"></div></section>
+  </div>
+  <section class="m-tablecard">
+    <div class="m-toolbar">
+      <div class="m-dims" id="mktDims">
+        <button class="on" data-dim="volume" data-i18n="mkt.dimVol">成交额</button>
+        <button data-dim="gainers" data-i18n="mkt.dimGain">涨幅榜</button>
+        <button data-dim="new" data-i18n="mkt.dimNew">新币</button>
+        <button data-dim="all" data-i18n="mkt.dimAll">全部</button>
+        <button data-dim="fav" data-i18n="mkt.dimFav">自选</button>
+      </div>
+      <span class="t-sp"></span>
+      <span class="m-meta" id="mktMeta"></span>
+    </div>
+    <div class="m-lh"><span data-i18n="mkt.lhPair">交易对 / 24h 成交额</span><span data-i18n="mkt.lhPrice">价格 / 24h 涨跌</span></div>
+    <table class="m-table" id="marketsTable">
+      <thead><tr>
+        <th data-i18n="t.pair">交易对</th>
+        <th class="sortable" data-sort="price" data-i18n="t.price">价格</th>
+        <th class="sortable" data-sort="changePct" data-i18n="mkt.chg">24h涨跌</th>
+        <th class="sortable" data-sort="vol" data-i18n="mkt.vol">24h成交额</th>
+        <th data-i18n="mkt.trend">走势</th>
+        <th data-i18n="mkt.fee">协议手续费</th>
+        <th class="r" data-i18n="t.action">操作</th>
+      </tr></thead>
+      <tbody id="marketsBody"></tbody>
+    </table>
+    <p class="t-empty hide" id="marketsEmpty" data-i18n="mkt.empty">还没有已上线的交易对。</p>
+  </section>
+  <p class="m-note" data-i18n="mkt.note">所有交易对协议手续费：吃单 0.30% · 挂单 0.10%。点一个交易对查看详情。</p>
+</main>
+
+<main class="view pd-view" id="viewToken" hidden>
+  <a class="pd-back" id="tkBack" data-route href="/markets"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg><span data-i18n="tk.backMkt">行情</span></a>
+  <section class="pd-head">
+    <span class="pd-ava" id="tkLogo"></span>
+    <div class="pd-name">
+      <div class="pd-row"><b id="tkSym">-</b><span class="pd-tag" data-i18n="ticker.spot">现货</span><button class="pd-fav" id="tkFav" type="button" aria-label="fav"><svg class="star-ic" viewBox="0 0 24 24"><path d="m12 3.6 2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z"/></svg></button></div>
+      <span class="pd-sub" id="tkName"></span>
+    </div>
+    <div class="pd-px"><b id="tkPrice">-</b><span class="pd-chg" id="tkChg"></span></div>
+    <span class="t-sp"></span>
+    <button class="pd-trade" id="tkTradeBtn" data-i18n="nav.trade">交易</button>
+  </section>
+  <div class="pd-cols">
+    <section class="pd-card pd-chart">
+      <div class="pd-ch-head">
+        <span class="pd-ttl" data-i18n="tk.price">价格</span>
+        <div class="pd-tf" id="tkTf">
+          <button data-tf="20" data-i18n="tk.tf1h">1H</button>
+          <button class="on" data-tf="120" data-i18n="tk.tf24h">24H</button>
+          <button data-tf="480" data-i18n="tk.tf7d">7D</button>
+          <button data-tf="1920" data-i18n="tk.tf30d">30D</button>
+          <button data-tf="11520" data-i18n="tk.tfall">全部</button>
+        </div>
+      </div>
+      <div class="pd-stats">
+        <div><span data-i18n="tk.high">24h最高</span><b id="tkHigh">-</b></div>
+        <div><span data-i18n="tk.low">24h最低</span><b id="tkLow">-</b></div>
+        <div><span data-i18n="tk.vol24">24h成交额</span><b id="tkVol">-</b></div>
+        <div><span data-i18n="tk.trades24">24h成交数</span><b id="tkTrades">-</b></div>
+      </div>
+      <div class="pd-plot"><canvas id="tkChart"></canvas></div>
+      <div class="legend" id="tkLegend" hidden></div>
+    </section>
+    <section class="pd-card pd-info">
+      <h3 class="pd-ttl2" data-i18n="tk.info">交易对信息</h3>
+      <dl class="pd-list" id="tkInfo"></dl>
+      <div class="pd-links" id="tkLinks"></div>
+    </section>
+  </div>
+  <section class="pd-card pd-trades">
+    <div class="pd-tr-head"><h3 class="pd-ttl2" data-i18n="tab.trades">最近成交</h3></div>
+    <table class="pd-table">
+      <thead><tr><th data-i18n="t.time">时间</th><th data-i18n="t.price">价格</th><th data-i18n="t.qty">数量</th><th data-i18n="order.notional">成交额</th><th data-i18n="tk.fee">手续费</th><th class="r" data-i18n="tk.tx">交易哈希</th></tr></thead>
+      <tbody id="tkTradesBody"></tbody>
+    </table>
+    <div class="pd-mcols"><span data-i18n="t.time">时间</span><span data-i18n="t.price">价格</span><span data-i18n="t.qty">数量</span></div>
+    <div class="pd-mlist" id="tkTradesM"></div>
+    <p class="t-empty" id="tkTradesEmpty" data-i18n="t.emptyTrades">这个交易对还没有成交记录。</p>
+  </section>
+</main>
+
+<main class="view" id="viewPool" hidden>
+  <div class="pool-wrap">
+
+    <section class="pool-card">
+      <div class="pool-tabs">
+        <button class="pool-tab on" data-pooltab="add" data-i18n="pool.tabAdd">添加流动性</button>
+        <button class="pool-tab" data-pooltab="mine" data-i18n="pool.tabMine">我的流动性</button>
+      </div>
+
+      <div class="pool-pane" data-pool-pane="add">
+
+        <div class="pool-token-row">
+          <input id="poolToken" class="pool-addr" placeholder="0x… 代币合约地址" data-i18n-ph="pool.tokenPh" spellcheck="false" autocomplete="off">
+          <button class="pool-detect" id="poolDetectBtn" data-i18n="pool.detect">识别</button>
+        </div>
+
+        <div id="poolMetaBox" class="pool-ident hide">
+          <img id="poolLogoImg" class="pool-ident-logo" alt="">
+          <div class="pool-ident-main">
+            <input id="poolName" class="pool-ident-name" placeholder="名称" data-i18n-ph="pool.namePh">
+            <span class="pool-ident-sym" id="poolSymbol">-</span>
+          </div>
+          <span class="pool-mode-tag" id="poolModeHint"></span>
+        </div>
+        <input id="poolLogo" type="hidden">
+        <input id="poolDecimals" type="hidden">
+        <p class="pool-err" id="poolErr1"></p>
+
+        <div id="poolAmountBox">
+          <div class="pool-amt">
+            <div class="pool-amt-head"><span data-i18n="pool.youPayBase">投入代币</span><span class="pool-amt-bal" id="poolVaultBase"></span></div>
+            <div class="pool-amt-body">
+              <input id="poolBaseAmt" class="pool-amt-input" inputmode="decimal" placeholder="0.0">
+              <span class="pool-amt-cur" id="poolBaseCur" data-i18n="pool.curToken">代币</span>
+            </div>
+          </div>
+
+          <div class="pool-plus">+</div>
+
+          <div class="pool-amt">
+            <div class="pool-amt-head"><span data-i18n="pool.youPayQuote">投入 USDT</span><span class="pool-amt-bal" id="poolVaultQuote"></span></div>
+            <div class="pool-amt-body">
+              <input id="poolQuoteAmt" class="pool-amt-input" inputmode="decimal" placeholder="0.0">
+              <span class="pool-amt-cur">USDT</span>
+            </div>
+          </div>
+
+          <div class="pool-info">
+            <div class="pool-info-row"><span data-i18n="pool.price">中间价</span><span id="poolPriceShow">-</span></div>
+            <div class="pool-info-row"><span data-i18n="pool.pvLevels">每侧挂单档数</span><span id="poolPvLevels">-</span></div>
+            <div class="pool-info-row"><span data-i18n="pool.pvWidth">盘口覆盖范围</span><span id="poolPvWidth">-</span></div>
+            <div class="pool-info-row" id="poolFeeRow" hidden><span data-i18n="pool.createFee">建对费</span><span id="poolFeeShow">-</span></div>
+          </div>
+          <p class="pool-hint pool-hint-warn" id="poolThinHint" hidden data-i18n="pool.tooThin">投入金额太小，撑不起有效盘口。请增加投入数量。</p>
+          <p class="pool-hint pool-hint-warn" id="poolBalHint" hidden></p>
+
+          <button class="pool-cta" id="poolAddBtn" data-i18n="pool.addBtn">添加流动性</button>
+          <button class="pool-cta pool-sign-btn" id="poolSignBtn" hidden></button>
+          <div id="poolProgress" class="pool-progress"></div>
+          <div id="poolSteps" class="pool-steps" hidden></div>
+          <p class="pool-err" id="poolErr2"></p>
+        </div>
+      </div>
+
+      <div class="pool-pane hide" data-pool-pane="mine">
+        <p class="pool-mine-empty" id="poolMineEmpty" data-i18n="pool.mineEmpty">还没有做市中的交易对。切换到“添加流动性”即可开始。</p>
+        <div id="poolMineList"></div>
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<main class="view" id="viewMM" hidden>
+  <div class="mmx-wrap">
+
+    <section class="mmx-hero">
+      <h1 data-i18n="mmx.heroTitle">成为 SORDEX 做市商</h1>
+      <p data-i18n="mmx.heroSub">非托管、零审核、即时开通。用自己的资金地址签名领取 API Key，自建策略对接订单簿。</p>
+    </section>
+
+    <section class="mmx-feats">
+      <div class="mmx-feat"><h3 data-i18n="mmx.f1t">非托管</h3><p data-i18n="mmx.f1d">资金始终锁在你自己的做市金库或钱包授权额度内，平台零提现权，撤回随时。</p></div>
+      <div class="mmx-feat"><h3 data-i18n="mmx.f2t">maker 费率 0</h3><p data-i18n="mmx.f2d">认证做市商挂单免协议费，只有吃单按普通费率。盘口越好，激励越高。</p></div>
+      <div class="mmx-feat"><h3 data-i18n="mmx.f3t">零审核即时开通</h3><p data-i18n="mmx.f3d">资金地址签名即时领取 API Key，无需等待人工审核。随时自助轮换、更新 IP。</p></div>
+      <div class="mmx-feat"><h3 data-i18n="mmx.f4t">自建策略</h3><p data-i18n="mmx.f4d">用 API 提交你自己的签名报价，完全掌控价格与节奏；也可用平台公开自动做市规则一键托管。</p></div>
+    </section>
+
+    <section class="pool-card">
+      <div class="pool-card-top"><h2 data-i18n="mmx.flowTitle">接入流程</h2></div>
+      <ol class="mmx-steps">
+        <li><span class="mmx-num">1</span><div><b data-i18n="mmx.s1t">准备资金</b><span data-i18n="mmx.s1d">资金放在 EOA 钱包，或放在合约金库 / 多签（无私钥）。</span></div></li>
+        <li><span class="mmx-num">2</span><div><b data-i18n="mmx.s2t">签名领取 Key</b><span data-i18n="mmx.s2d">EOA 直接本地址签名；合约金库先 setAgent 授权一个签名地址，再用该地址代签。</span></div></li>
+        <li><span class="mmx-num">3</span><div><b data-i18n="mmx.s3t">配置 IP 白名单</b><span data-i18n="mmx.s3d">填入你的做市程序出口 IP 或网段，只有白名单内的 IP 能用这把 Key 报价。</span></div></li>
+        <li><span class="mmx-num">4</span><div><b data-i18n="mmx.s4t">对接 API 报价</b><span data-i18n="mmx.s4d">请求头带 x-mm-key 提交签名报价。接口文档见 API 页。</span></div></li>
+      </ol>
+    </section>
+
+    <section class="pool-card">
+      <div class="pool-card-top"><h2 data-i18n="mmx.applyTitle">领取 API Key</h2></div>
+
+      <div id="mmxConnectHint" class="mmx-connect">
+        <p data-i18n="mmx.connectFirst">请先连接钱包，再领取或管理你的 API Key。</p>
+        <button class="pool-cta" id="mmxConnectBtn" data-i18n="mmx.connectBtn">连接钱包</button>
+      </div>
+
+      <div id="mmxForm" class="hide">
+        <label class="mmx-label" data-i18n="mmx.maker">资金地址（做市资金所在地址）</label>
+        <input id="mmxMaker" class="pool-addr" placeholder="0x…" spellcheck="false" autocomplete="off">
+        <p class="mmx-tip" id="mmxMakerTip"></p>
+
+        <label class="mmx-label" data-i18n="mmx.ips">允许的 IP / 网段（每行一个，支持 1.2.3.4 或 1.2.3.0/24）</label>
+        <textarea id="mmxIps" class="mmx-ta" rows="3" placeholder="1.2.3.4&#10;10.0.0.0/8"></textarea>
+        <button class="mmx-mini" id="mmxMyIpBtn" data-i18n="mmx.myip">填入我的当前出口 IP</button>
+
+        <div class="field two mmx-opt">
+          <div><label class="mmx-label" data-i18n="mmx.labelName">名称（可选）</label><input id="mmxName" placeholder=""></div>
+          <div><label class="mmx-label" data-i18n="mmx.email">邮箱（可选）</label><input id="mmxEmail" placeholder="you@example.com"></div>
+        </div>
+
+        <p class="mmx-status" id="mmxStatus"></p>
+        <button class="pool-cta" id="mmxIssueBtn" data-i18n="mmx.issueBtn">签名并领取 API Key</button>
+        <p class="pool-err" id="mmxErr"></p>
+
+        <div id="mmxKeyResult" class="mmx-keybox hide">
+          <p class="mmx-keywarn" data-i18n="mmx.keyWarn">请立刻复制保存，这把 Key 只显示这一次，关闭后无法再次查看。</p>
+          <div class="mmx-keyrow"><code id="mmxKeyValue"></code><button class="mmx-mini" id="mmxKeyCopy" data-i18n="mmx.copy">复制</button></div>
+        </div>
+
+        <div id="mmxManage" class="mmx-manage hide">
+          <div class="pool-info">
+            <div class="pool-info-row"><span data-i18n="mmx.curStatus">当前状态</span><span id="mmxCurStatus">-</span></div>
+            <div class="pool-info-row"><span data-i18n="mmx.curIps">当前白名单</span><span id="mmxCurIps">-</span></div>
+          </div>
+          <button class="pool-cta slim" id="mmxUpdateIpBtn" data-i18n="mmx.updateIpBtn">更新 IP 白名单</button>
+          <p class="mmx-tip" data-i18n="mmx.rotateTip">重新点「签名并领取」会轮换 Key，旧 Key 立即失效。</p>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<main class="grid single view" id="viewReferral" hidden>
+  <section class="panel pad">
+    <div class="panel-head"><span data-i18n="ref.title">返佣</span><span class="src" data-i18n="ref.src">以实收手续费为基数</span></div>
+    <div class="field">
+      <label data-i18n="ref.inviter">邀请人地址</label>
+      <input id="refInviter" placeholder="0x…">
+    </div>
+    <button class="submit" id="bindBtn" data-i18n="ref.bind">绑定邀请关系</button>
+    <p class="note-line" data-i18n="ref.bindHint">绑定只能在首次成交前完成，绑定后不可更改。</p>
+    <div class="panel-head mt"><span data-i18n="ref.claimable">可领取手续费返佣</span></div>
+    <dl class="summary wide">
+      <div><dt data-i18n="ref.myAddress">我的地址</dt><dd id="refAddr">-</dd></div>
+      <div><dt data-i18n="ref.claimableAmt">累计可领取</dt><dd id="refClaimable">-</dd></div>
+    </dl>
+    <button class="submit" id="claimBtn" data-i18n="ref.claim">领取</button>
+    <p class="err" id="refErr"></p>
+    <p class="note-line" data-i18n="ref.hint">分账比例：平台 50%、一级邀请 30%、二级邀请 10%、安全储备 10%。返佣是手续费的子集，刷量无法获利。</p>
+  </section>
+</main>
+
+<main class="view acct-view" id="viewAccount" hidden>
+  <div class="acct-wrap">
+
+    <section class="acct-guest" id="acctGuest">
+      <div class="acct-guest-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="6" width="17" height="13" rx="2.5"/><path d="M3.5 10h17"/><path d="M15.5 14.5h2"/></svg></div>
+      <h1 data-i18n="acct.guestTitle">你的资产，始终在你自己的钱包里</h1>
+      <p data-i18n="acct.guestDesc">SORDEX 不托管资金：没有充值和提现，挂单和做市资金锁在合约里，随时可以取回。连接钱包后，这里会汇总你的余额、委托和流动性。</p>
+      <button class="submit acct-connect" id="acctConnect" data-i18n="wallet.connect">连接钱包</button>
+      <ul class="acct-points">
+        <li data-i18n="acct.p1">资金不经过平台，成交一笔原子交割</li>
+        <li data-i18n="acct.p2">随时撤单、随时取回做市资金</li>
+        <li data-i18n="acct.p3">所有记录都可以在区块浏览器上核对</li>
+      </ul>
+    </section>
+
+    <section class="acct-main" id="acctMain" hidden>
+      <div class="acct-card">
+        <div class="acct-id">
+          <span class="acct-ava"></span>
+          <div class="acct-id-txt">
+            <span class="acct-addr" id="acctAddr">-</span>
+            <span class="acct-net"><span class="dot ok"></span><span id="acctNet">BNB Chain</span></span>
+          </div>
+          <div class="acct-id-act">
+            <button class="ghost-btn" id="acctCopy" data-i18n="wallet.copy">复制</button>
+            <a class="ghost-btn" id="acctScan" target="_blank" rel="noopener" data-i18n="acct.viewScan">浏览器查看</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="pnl-card">
+        <div class="pnl-nums">
+          <div class="pn"><span class="k" data-i18n="acct.value">资产估值 (USDT)</span><b class="v big" id="acctValue">-</b></div>
+          <div class="pn"><span class="k" data-i18n="acct.today">今日盈亏</span><b class="v" id="acctToday">-</b></div>
+          <div class="pn"><span class="k" data-i18n="acct.total">累计盈亏</span><b class="v" id="acctTotal">-</b></div>
+        </div>
+        <div class="pnl-ctl">
+          <div class="seg-mini" id="pnlSeries"><button class="on" data-series="total" data-i18n="acct.sTotal">总收益</button><button data-series="trading" data-i18n="acct.sTrading">交易</button><button data-series="mm" data-i18n="acct.sMm">做市</button></div>
+          <div class="seg-mini" id="pnlRange"><button data-range="7">7D</button><button class="on" data-range="30">30D</button><button data-range="90">90D</button><button data-range="0" data-i18n="acct.all">全部</button></div>
+        </div>
+        <div class="pnl-chart-wrap"><canvas id="pnlChart"></canvas><div class="pnl-tip" id="pnlTip" hidden></div></div>
+        <p class="pnl-note" data-i18n="acct.pnlNote">按你在 SORDEX 的成交和做市记录计算，不含钱包外的转入转出。交易收益按平均成本法，做市收益 = 金库现值 − 净投入。</p>
+      </div>
+
+      <div class="acct-tabs" id="acctTabs">
+        <button class="on" data-atab="assets" data-i18n="acct.tAssets">资产</button>
+        <button data-atab="orders" data-i18n="acct.orders">委托</button>
+        <button data-atab="trades" data-i18n="acct.tTrades">成交</button>
+        <button data-atab="liq" data-i18n="acct.tLiq">流动性</button>
+      </div>
+      <div class="acct-pane" data-apane="assets"><div id="acctAssets" class="asset-list"></div></div>
+      <div class="acct-pane" data-apane="orders" hidden><div id="acctOrders" class="order-cards"></div></div>
+      <div class="acct-pane" data-apane="trades" hidden><div id="acctTrades" class="mytrade-list"></div></div>
+      <div class="acct-pane" data-apane="liq" hidden><div id="acctLiq" class="asset-list"></div></div>
+
+    </section>
+
+    <button class="acct-out" id="acctDisconnect" hidden data-i18n="wallet.disconnect">断开连接</button>
+  </div>
+</main>
+
+<main class="view nf-view" id="viewNotFound" hidden>
+  <div class="nf-box">
+    <div class="nf-code">404</div>
+    <h1 data-i18n="nf.title">页面不存在</h1>
+    <p data-i18n="nf.desc">你访问的页面不存在，可能是链接写错了，或者页面已经下线。</p>
+    <a class="pool-cta nf-btn" href="/" data-route data-i18n="nf.home">返回首页</a>
+  </div>
+</main>
+
+<footer class="foot">
+  <div class="foot-in">
+    <div class="foot-brand">
+      <img src="/logo.png?v=1" alt="SORDEX" height="22">
+      <p data-i18n="foot.note">SorDex 是非托管订单簿。挂单即把资产锁进合约，成交一笔原子交割，资产直接回到你的钱包。平台没有充值提现，也没有权力动用你的资金。</p>
+    </div>
+    <div class="foot-cols">
+      <div><b data-i18n="foot.product">产品</b><a href="/markets" data-route data-i18n="nav.markets">行情</a><a href="/trade" data-route data-i18n="nav.trade">交易</a><a href="/swap" data-route data-i18n="nav.swap">快捷交易</a><a href="/pool" data-route data-i18n="nav.pool">流动性</a></div>
+      <div><b data-i18n="foot.dev">开发者</b><a href="/api.html" data-i18n="nav.apiDocs">API 文档</a><a href="/mm" data-route data-i18n="foot.mm">成为做市商</a><a href="/reclaim-legacy.html" data-i18n="foot.reclaim">历史合约资产取回</a></div>
+    </div>
+  </div>
+  <div class="foot-bot"><span>© 2026 SORDEX</span><span data-i18n="foot.terms">计价币 USDT · 挂单 0.10% · 吃单 0.30%</span></div>
+</footer>
+
+<div class="modal-scrim" id="modalScrim" hidden></div>
+<div class="modal" id="modal" hidden role="dialog" aria-modal="true">
+  <div class="modal-head"><b id="modalTitle"></b><button class="modal-x" id="modalClose" aria-label="close">×</button></div>
+  <div class="modal-body" id="modalBody"></div>
+</div>
+
+<nav class="mnav" id="mnav">
+  <a href="/" data-route data-view="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11 12 4l8 7"/><path d="M6 10v9h12v-9"/></svg><span data-i18n="nav.home">首页</span></a>
+  <a href="/markets" data-route data-view="markets"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20V9"/><path d="M12 20V4"/><path d="M19 20v-7"/></svg><span data-i18n="nav.markets">行情</span></a>
+  <a href="/trade" data-route data-view="trade"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="8" width="5" height="9" rx="1"/><path d="M6.5 5v3M6.5 17v2"/><rect x="15" y="7" width="5" height="7" rx="1"/><path d="M17.5 4v3M17.5 14v3"/></svg><span data-i18n="nav.trade">交易</span></a>
+  <a href="/swap" data-route data-view="swap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h13l-3.5-3.5"/><path d="M20 16H7l3.5 3.5"/></svg><span data-i18n="nav.swap">快捷交易</span></a>
+  <a href="/account" data-route data-view="account"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="6" width="17" height="13" rx="2.5"/><path d="M3.5 10h17"/><path d="M15.5 14.5h2"/></svg><span data-i18n="nav.account">账户</span></a>
+</nav>
+
+<div class="wallet-scrim" id="walletScrim" hidden></div>
+<div class="walletmenu" id="walletMenu" hidden>
+  <div class="wm-handle"></div>
+  <div class="wm-head"><span class="wm-title" data-i18n="wallet.title">钱包</span><span class="wm-badge"><i></i><span data-i18n="wallet.connected">已连接</span></span></div>
+  <div class="wm-addr"><span class="wm-ava"></span><span id="wmAddr">-</span><button class="wm-copy" id="wmCopy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/></svg><span data-i18n="wallet.copy">复制</span></button></div>
+  <div class="wm-rows">
+    <div class="wm-row"><span class="k" data-i18n="wallet.network">网络</span><span class="v" id="wmNet">-</span></div>
+    <div class="wm-row"><span class="k" data-i18n="wallet.quote">可用 USDT</span><span class="v" id="wmQuote">-</span></div>
+    <div class="wm-row"><span class="k" id="wmBaseK" data-i18n="wallet.base">可用基础币</span><span class="v" id="wmBase">-</span></div>
+    <a class="wm-row wm-acct" href="/account" data-route><span class="k" data-i18n="wallet.viewAccount">查看我的资产</span><span class="v"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span></a>
+  </div>
+  <button class="wm-out" id="wmDisconnect" data-i18n="wallet.disconnect">断开连接</button>
+</div>
+
+<div class="toast-host" id="toastHost"></div>
+
+<script src="/config.js"></script>
+<script type="module" src="/app.js?v=20261117t1"></script>
+</body>
+</html>

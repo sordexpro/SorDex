@@ -1,0 +1,19 @@
+{
+  "name": "sordex-frontend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Web frontend of SorDex, a non-custodial spot order-book DEX on BNB Chain",
+  "license": "GPL-3.0-only",
+  "type": "module",
+  "scripts": {
+    "dev": "node scripts/dev-server.mjs",
+    "build:viem": "node scripts/build-viem.mjs"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.0",
+    "viem": "2.57.16"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
